@@ -1,0 +1,310 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Opengcl</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="snailgoers">
+    
+    <meta name="description" content="算法设计学习分享,图像处理,计算几何,通用计算库">
+    
+    
+    <meta name="keywords" content="算法设计学习分享,图像处理,计算几何,通用计算库">
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Opengcl">Opengcl</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/algorithm">Alogrithm</a></li>
+					
+						<li><a href="/application">App</a></li>
+					
+						<li><a href="/life">Life</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:opengcl.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main">
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2014/12/30/bwlabel之C++/" title="bwlabel之C++" itemprop="url">
+  
+    <h1 itemprop="name">bwlabel之C++</h1>
+    
+     
+           <p itemprop="description" >最近因为需要，会用到二值图像连通域分析算法，网上找了一些算法，但是都存在问题，比较多的一个是利用等价表的方法剔除错误标签方法，但是在后续开发中，验证了这个算法也存在问题，参考这个链接，改为c++的代码，文中作者也提出了相应的改进算法，但是不是很明白，按此建议修改错误标签更正算法，</p>
+        
+    
+    <time datetime="2014-12-30T06:30:18.000Z" itemprop="datePublished">Dec 30 2014</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2014/12/25/svn file locked error/" title="svn file was locked ,can not commit" itemprop="url">
+  
+    <h1 itemprop="name">svn file was locked ,can not commit</h1>
+    
+     
+           <p itemprop="description" >when you use svn,when one file was locked by another ,you can not update and commit ,you can relocked the file ,it can point out the one who</p>
+        
+    
+    <time datetime="2014-12-25T07:34:25.000Z" itemprop="datePublished">Dec 25 2014</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2014/12/23/C++野指针编译错误/" title="c++野指针释放出错" itemprop="url">
+  
+    <h1 itemprop="name">c++野指针释放出错</h1>
+    
+     
+           <p itemprop="description" >动态申请指针数组时，最后都要释放内存，但是如果中间内存越界，即野指针，在释放的过程中，会出debbg错误，如下图所示，
+
+例如，
+double *data = new double[5];
+data[5] = 6;
+delete[] data;
+这是常见的，也是比较容易发现的，但</p>
+        
+    
+    <time datetime="2014-12-23T09:19:27.000Z" itemprop="datePublished">Dec 23 2014</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2014/11/14/opencv3.0+vs2008编译静态库/" title="opencv3.0 vs2008 编译静态库" itemprop="url">
+  
+    <h1 itemprop="name">opencv3.0 vs2008 编译静态库</h1>
+    
+     
+           <p itemprop="description" >最近因工作需要，需要编译64位的opencv静态lib库，由于之前一直用dll文件，这次还是走了不少弯路，用多长时间，就不说了，不好意思，也主要自己对微软的东西不是很感冒，好久搞不明白，这里坐下备注，防止日后再用到找不到。先说环境吧，vs2008因为一直都在用，不像换新的，所以这</p>
+        
+    
+    <time datetime="2014-11-14T07:06:45.000Z" itemprop="datePublished">Nov 14 2014</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2014/11/10/最大子数组求解/" title="最大子数组求解" itemprop="url">
+  
+    <h1 itemprop="name">最大子数组求解</h1>
+    
+     
+           <p itemprop="description" >在做股票投资时，当买进最低，抛出最高时，获取的盈利是最大的，分别求出当天相对于前天的差价，数学上讲，将差价定义为一个数组，求其一阶差分，求一个数组下标，使得其和最大。
+为了解决这一问题，可以采用分治法解决，对于数组A，开始、中间和结束坐标索引为low,mid,hight,最大的子</p>
+        
+    
+    <time datetime="2014-11-10T09:05:19.000Z" itemprop="datePublished">Nov 10 2014</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2014/11/04/归并排序/" title="归并排序" itemprop="url">
+  
+    <h1 itemprop="name">归并排序</h1>
+    
+     
+           <p itemprop="description" >归并排序是将两个有序表合并成一个有序表的过程，即把待排序序列分割成多个排好序的子序列，再合并成一个有序序列。该方法是分治法一个典型应用，类似与从两个排好序的纸牌中选择小的排成一个大的有序列。例如有两个有序表：（7,10,13,15）和（4,8,19,20），归并后得到的有序表为：</p>
+        
+    
+    <time datetime="2014-11-04T02:33:18.000Z" itemprop="datePublished">Nov 4 2014</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2014/11/04/插入排序/" title="插入排序" itemprop="url">
+  
+    <h1 itemprop="name">插入排序</h1>
+    
+     
+           <p itemprop="description" >插入排序，将未整理好的牌按大小插在已经排好序的队列中。
+
+INSERTION-SORT(A)
+1    for j = 2 to A.length
+2        key = A[j]
+3        i = j - 1
+4        while i &amp;gt; 0 and</p>
+        
+    
+    <time datetime="2014-11-04T02:15:18.000Z" itemprop="datePublished">Nov 4 2014</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2014/09/26/图像特征之：HaarLike/" title="图像特征之：haarlike" itemprop="url">
+  
+    <h1 itemprop="name">图像特征之：haarlike</h1>
+    
+     
+           <p itemprop="description" >参考
+###Haar-like特征最早是由Papageorgiou等应用于人脸表示，Viola和Jones在此基础上，使用3种类型4种形式的特征。Haar特征分为三类：边缘特征、线性特征、中心特征和对角线特征，组合成特征模板。特征模板内有白色和黑色两种矩形，并定义该模板的特征值为</p>
+        
+    
+    <time datetime="2014-09-26T06:31:45.000Z" itemprop="datePublished">Sep 26 2014</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2014/09/23/屏幕蓝光危害大/" title="屏幕蓝光七大危害，可能导致癌变" itemprop="url">
+  
+    <h1 itemprop="name">屏幕蓝光七大危害，可能导致癌变</h1>
+    
+     
+           <p itemprop="description" >转载
+华盛顿邮报日前报道：哈佛大学研究表明，睡前玩智能手机，看电视剧或玩电子游戏，电子设备发出的光线，特别是蓝光，能够抑制褪黑素的分泌，打扰睡眠，增加自身重大疾病的发生率。其中青少年受光线的影响，比成年人更大！
+###褪黑素调整昼夜节律何为褪黑素？人脑部深处，有一个像松果般大小的</p>
+        
+    
+    <time datetime="2014-09-23T08:28:36.000Z" itemprop="datePublished">Sep 23 2014</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2014/09/23/vs2008 output 输出结果/" title="vs2008 output 输出结果" itemprop="url">
+  
+    <h1 itemprop="name">vs2008 output 输出结果</h1>
+    
+     
+           <p itemprop="description" >在vs2008的时候，如果你想查看一些变量的值，一是可以输出到文本，一是可以添加到watch，但是对于一些数组指针，却不是很好使了，这时一个可行的方法是把结果直接打印到output窗口中：    
+#include &amp;lt;Windows.h&amp;gt;
+#include &amp;lt;t</p>
+        
+    
+    <time datetime="2014-09-23T05:56:44.000Z" itemprop="datePublished">Sep 23 2014</time>
+  </a>
+</section>
+
+
+  <nav id="page-nav" class="clearfix">
+    <a class="extend prev" rel="prev" href="/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/3/">Next &raquo;</a>
+  </nav>
+
+</div>
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+<div id="asidepart">
+
+<aside class="clearfix">
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Copyright  © 2015 
+		snail
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+
+
+
+
+
+  </body>
+ </html>

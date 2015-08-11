@@ -1,0 +1,304 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Opengcl</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="snailgoers">
+    
+    <meta name="description" content="算法设计学习分享,图像处理,计算几何,通用计算库">
+    
+    
+    <meta name="keywords" content="算法设计学习分享,图像处理,计算几何,通用计算库">
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Opengcl">Opengcl</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/algorithm">Alogrithm</a></li>
+					
+						<li><a href="/application">App</a></li>
+					
+						<li><a href="/life">Life</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:opengcl.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main">
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2014/09/18/轮廓跟踪检测/" title="轮廓跟踪及检测" itemprop="url">
+  
+    <h1 itemprop="name">轮廓跟踪及检测</h1>
+    
+     
+           <p itemprop="description" >效果图如上所示，主要完成轮廓的跟踪及内外轮廓检测，轮廓跟踪代码如下所示：    
+function pt =BoundaryTrack(bw, pstart)
+% 单个边缘跟踪，pstart为联通区右下方的像素点 当边缘位于边界处，无法跟踪，需将
+% 图像人为扩大2*2像素并置0</p>
+        
+    
+    <time datetime="2014-09-18T06:47:26.000Z" itemprop="datePublished">Sep 18 2014</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2014/09/05/mac安装cmake一系列问题/" title="os10.9 安装cmake的问题" itemprop="url">
+  
+    <h1 itemprop="name">os10.9 安装cmake的问题</h1>
+    
+     
+           <p itemprop="description" >最近要用opencv，对于版本控制有强烈要求的我，必然要安装最新版的opencv，可是在安装的时候却出现了很多问题，第一个就是cmake，用安装包安装的cmake是3.01版本的，在命令行里确实2.8X版本的，燧象删除老的版本，一直不成功，后来主要到电脑上有macport软件，又</p>
+        
+    
+    <time datetime="2014-09-04T16:00:00.000Z" itemprop="datePublished">Sep 5 2014</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2014/08/27/Delaunay三角剖分/" title="Delaunay三角剖分" itemprop="url">
+  
+    <h1 itemprop="name">Delaunay三角剖分</h1>
+    
+     
+      <p itemprop="description" >matlab 实现 delaunary逐点插入三角剖分</p>
+      
+    
+    <time datetime="2014-08-27T07:11:45.000Z" itemprop="datePublished">Aug 27 2014</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2014/08/27/计算点云凸包/" title="计算点云凸包" itemprop="url">
+  
+    <h1 itemprop="name">计算点云凸包</h1>
+    
+     
+           <p itemprop="description" >计算点云凸包其主要思路为：1）搜寻X坐标最小的点，在此称为startPoint，从该点开始搜寻下一点，本例中以逆时针方向来搜寻边界；2）现定义一个虚拟点（该点并不存在）位置为startPoint正北方向，该点与startPoint形成一个向量Vector1，下一点（判断是否为边界</p>
+        
+    
+    <time datetime="2014-08-27T06:41:56.000Z" itemprop="datePublished">Aug 27 2014</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2014/08/22/点到3D圆距离/" title="点到3D圆的距离" itemprop="url">
+  
+    <h1 itemprop="name">点到3D圆的距离</h1>
+    
+     
+           <p itemprop="description" >如下图所示，圆的中心为C0， 半径为R， 任意一点P0到圆的距离为D， P0到圆心的距离为L， 已知圆的法向量为vector， 其与C0P0的夹角为theta则根据余玄定理可知：
+D = sqrt(L^2+R^2-2*L*R*cos(90-theta))</p>
+        
+    
+    <time datetime="2014-08-22T03:13:34.000Z" itemprop="datePublished">Aug 22 2014</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2014/08/18/vs2008替换tab空格为空格符号/" title="vs2008 将原有tab空格设置为空格符号" itemprop="url">
+  
+    <h1 itemprop="name">vs2008 将原有tab空格设置为空格符号</h1>
+    
+     
+           <p itemprop="description" >1、首先将设置tab的空格缩进：Tools –&amp;gt; Options –&amp;gt; Text Editor”，如果是编写C/C++程序，就打开“C/C++–&amp;gt;Tabs”，在这里，选中“Insert spaces”即可
+2、显示空格：ctrl+shift+*快捷键，或者Edi</p>
+        
+    
+    <time datetime="2014-08-18T02:51:12.000Z" itemprop="datePublished">Aug 18 2014</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2014/08/15/根据旋转前后向量确定旋转矩阵/" title="根据旋转前后向量求旋转矩阵" itemprop="url">
+  
+    <h1 itemprop="name">根据旋转前后向量求旋转矩阵</h1>
+    
+     
+           <p itemprop="description" >如果已知旋转前后向量的变化，如何求旋转矩阵呢？1、旋转角度：已经旋转前向量P及旋转后向量Q，由点积定义可知
+P.Q =|P| |Q| cos(theta)
+2、旋转轴：由上可知，旋转角所在平面为P和Q构成的平面，那么旋转轴必定垂直于该平面，
+A X B =(a2b3-a3b2)i</p>
+        
+    
+    <time datetime="2014-08-15T04:44:29.000Z" itemprop="datePublished">Aug 15 2014</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2014/08/13/图像增强/" title="图像预处理之：对比度增强" itemprop="url">
+  
+    <h1 itemprop="name">图像预处理之：对比度增强</h1>
+    
+     
+           <p itemprop="description" >这次主要针对真彩色图像做的增强，将RGB域转为HSI域，增强I分量，达到增强效果，效果如下：代码如下：    
+#define MIN(a, b) ((a) &amp;lt; (b) ? (a) : (b))    
+#define MAX(a, b) ((a) &amp;gt; (b) ? (</p>
+        
+    
+    <time datetime="2014-08-13T07:37:34.000Z" itemprop="datePublished">Aug 13 2014</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2014/08/11/“李妈妈”牛肉面/" title="“李妈妈”牛肉面" itemprop="url">
+  
+    <h1 itemprop="name">“李妈妈”牛肉面</h1>
+    
+     
+      <p itemprop="description" >李开复妈妈做的牛肉面配方</p>
+      
+    
+    <time datetime="2014-08-11T07:39:14.000Z" itemprop="datePublished">Aug 11 2014</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2014/08/11/vs2008编译文件在没有vs环境上运行/" title="vs2008编译程序在没有vs环境上运行" itemprop="url">
+  
+    <h1 itemprop="name">vs2008编译程序在没有vs环境上运行</h1>
+    
+     
+           <p itemprop="description" >有的时候我们编译的dll或exe在一台没有安装vs的电脑上，无法运行，往往提示缺少必要的dll文件，这是因为我们在编译的时候选择的runtime libray 不一致导致的，
+MT（Multi-threaded）：多线程版本
+MTd（Multi-threaded debug）：多</p>
+        
+    
+    <time datetime="2014-08-11T07:21:16.000Z" itemprop="datePublished">Aug 11 2014</time>
+  </a>
+</section>
+
+
+  <nav id="page-nav" class="clearfix">
+    <a class="extend prev" rel="prev" href="/page/2/">&laquo; Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/4/">Next &raquo;</a>
+  </nav>
+
+</div>
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+<div id="asidepart">
+
+<aside class="clearfix">
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Copyright  © 2015 
+		snail
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+
+
+
+
+
+  </body>
+ </html>

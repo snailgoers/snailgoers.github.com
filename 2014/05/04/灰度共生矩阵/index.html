@@ -1,0 +1,410 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>灰度共生矩阵（GLCM） | Opengcl</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="snailgoers">
+    
+    <meta name="description" content="共生矩阵用两个位置的象素的联合概率密度来定义，它不仅反映亮度的分布特性，也反映具有同样亮度或接近亮度的象素之间的位置分布特性，是有关图象亮度变化的二阶统计特征。它是定义一组纹理特征的基础。
+一幅图象的灰度共生矩阵能反映出图象灰度关于方向、相邻间隔、变化幅度的综合信息，它是分析图象的局部模式和它们排列规则的基础。
+设f(x,y)为一幅二维数字图象，其大小为M×N，灰度级别为Ng,则满足一定空间关系的灰度共生矩阵为
+P(i,j)=#｛(x1,y1),(x2,y2)∈M×N｜f(x1,y1)=i,f(x2,y2)=j｝
+其中#(x)表示集合x中的元素个数，显然P为Ng×Ng的矩阵，若(x1,y1)与(x2,y2)间距离为d,两者与坐标横轴的夹角为θ，则可以得到各种间距及角度的灰度共生矩阵P(i,j,d,θ)。
+纹理特征提取的一种有效方法是以灰度级的空间相关矩阵即共生矩阵为基础的［7］，因为图像中相距(Δx，Δy)的两个灰度像素同时出现的联合频率分布可以用灰度共生矩阵来表示。若将图像的灰度级定为N级，那么共生矩阵为N×N矩阵，可表示为M(Δx，Δy)(h,k)，其中位于(h,k)的元素mhk的值表示一个灰度为h而另一个灰度为k的两个相距为(Δx，Δy)的像素对出现的次数。">
+    
+    
+    <meta name="keywords" content="算法设计学习分享,图像处理,计算几何,通用计算库">
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Opengcl">Opengcl</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/algorithm">Alogrithm</a></li>
+					
+						<li><a href="/application">App</a></li>
+					
+						<li><a href="/life">Life</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:opengcl.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/05/04/灰度共生矩阵/" title="灰度共生矩阵（GLCM）" itemprop="url">灰度共生矩阵（GLCM）</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://opengcl.com" title="snailgoers">snailgoers</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2014-05-04T05:22:18.000Z" itemprop="datePublished">May 4 2014</time>
+    更新日期:<time datetime="2014-09-01T01:45:02.000Z" itemprop="dateModified">Sep 1 2014</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<p>共生矩阵用两个位置的象素的联合概率密度来定义，它不仅反映亮度的分布特性，也反映具有同样亮度或接近亮度的象素之间的位置分布特性，是有关图象亮度变化的二阶统计特征。它是定义一组纹理特征的基础。</p>
+<p>一幅图象的灰度共生矩阵能反映出图象灰度关于方向、相邻间隔、变化幅度的综合信息，它是分析图象的局部模式和它们排列规则的基础。</p>
+<p>设f(x,y)为一幅二维数字图象，其大小为M×N，灰度级别为Ng,则满足一定空间关系的灰度共生矩阵为</p>
+<p>P(i,j)=#｛(x1,y1),(x2,y2)∈M×N｜f(x1,y1)=i,f(x2,y2)=j｝</p>
+<p>其中#(x)表示集合x中的元素个数，显然P为Ng×Ng的矩阵，若(x1,y1)与(x2,y2)间距离为d,两者与坐标横轴的夹角为θ，则可以得到各种间距及角度的灰度共生矩阵P(i,j,d,θ)。</p>
+<p>纹理特征提取的一种有效方法是以灰度级的空间相关矩阵即共生矩阵为基础的［7］，因为图像中相距(Δx，Δy)的两个灰度像素同时出现的联合频率分布可以用灰度共生矩阵来表示。若将图像的灰度级定为N级，那么共生矩阵为N×N矩阵，可表示为M(Δx，Δy)(h,k)，其中位于(h,k)的元素mhk的值表示一个灰度为h而另一个灰度为k的两个相距为(Δx，Δy)的像素对出现的次数。<br><a id="more"></a><br>　　对粗纹理的区域，其灰度共生矩阵的mhk值较集中于主对角线附近。因为对于粗纹理，像素对趋于具有相同的灰度。而对于细纹理的区域，其灰度共生矩阵中的mhk值则散布在各处。</p>
+<p>为了能更直观地以共生矩阵描述纹理状况，从共生矩阵导出一些反映矩阵状况的参数，典型的有以下几种：</p>
+<p>（1）能量： 是灰度共生矩阵元素值的平方和，所以也称能量，反映了图像灰度分布均匀程度和纹理粗细度。如果共生矩阵的所有值均相等，则ASM值小；相反，如果其中一些值大而其它值小，则ASM值大。当共生矩阵中元素集中分布时，此时ASM值大。ASM值大表明一种较均一和规则变化的纹理模式。</p>
+<p>（2）对比度： ，其中 。反映了图像的清晰度和纹理沟纹深浅的程度。纹理沟纹越深，其对比度越大，视觉效果越清晰；反之，对比度小，则沟纹浅，效果模糊。灰度差即对比度大的象素对越多，这个值越大。灰度公生矩阵中远离对角线的元素值越大，CON越大。</p>
+<p>（3）相关：它度量空间灰度共生矩阵元素在行或列方向上的相似程度，因此，相关值大小反映了图像中局部灰度相关性。当矩阵元素值均匀相等时，相关值就大;相反，如果矩阵像元值相差很大则相关值小。如果图像中有水平方向纹理，则水平方向矩阵的COR大于其余矩阵的COR值。</p>
+<p>（4）熵： 是图像所具有的信息量的度量，纹理信息也属于图像的信息，是一个随机性的度量，当共生矩阵中所有元素有最大的随机性、空间共生矩阵中所有值几乎相等时，共生矩阵中元素分散分布时，熵较大。它表示了图像中纹理的非均匀程度或复杂程度。</p>
+<p>（5）逆差距： 反映图像纹理的同质性，度量图像纹理局部变化的多少。其值大则说明图像纹理的不同区域间缺少变化，局部非常均匀。</p>
+<p>其它参数:</p>
+<p>中值<mean></mean></p>
+<p>协方差<variance></variance></p>
+<p>同质性/逆差距<homogeneity></homogeneity></p>
+<p>反差<contrast></contrast></p>
+<p>差异性<dissimilarity></dissimilarity></p>
+<p>熵<entropy></entropy></p>
+<p>二阶距<angular second="" moment=""></angular></p>
+<p>自相关<correlation></correlation></p>
+<p>当图像的局部有较小的方差时，则灰度值占有支配地位，当图像的局部有较大的方差时，则纹理占有支配地位。纹理是和局部灰度及其空间组织相联系的，纹理在识别感兴趣的目标和地区中有着非常重要的作用。</p>
+<p>灰度共生矩阵表示了灰度的空间依赖性，它表示了在一种纹理模式下的像素灰度的空间关系。它的弱点是没有完全抓住局部灰度的图形特点，因此对于较大的局部，此方法的效果不太理想。灰度共生矩阵为方阵，维数等于图像的灰度级。灰度共生矩阵中的元素（i，j）的值表示了在图像中其中一个像素的灰度值为i，另一个像素的灰度值为j，并且相邻距离为d，方向为A的这样两个像素出现的次数。在实际应用中A一般选择为0°、45°、90°、135°。一般来说灰度图像的灰度级为256，在计算由灰度共生矩阵推导出的纹理特征时，要求图像的灰度级远小于256，主要是因为矩阵维数较大而窗口的尺寸较小则灰度共生矩阵不能很好表示纹理，如要能够很好表示纹理则要求窗口尺寸较大，这样使计算量大大增加，而且当窗口尺寸较大时对于每类的边界区域误识率较大。所以在计算灰度共生矩阵之前需要对图像进行直方图规定化，以减小图像的灰度级，一般规定化后的图像的灰度级为8或16。由灰度共生矩阵能够导出许多纹理特征，本文计算了14种灰度共生矩阵特征，分别为纹理二阶距、纹理熵、纹理对比度、纹理均匀性、纹理相关、逆差分矩、最大概率、纹理方差、共生和均值、共生和方差、共生和熵、共生差均值、共生差方差、共生差熵。</p>
+<p>由灰度共生矩阵能够导出许多纹理特征，计算了14种灰度共生矩阵特征，分别为纹理二阶距、纹理熵、纹理对比度、纹理均匀性、纹理相关、逆差分矩、最大概率、纹理方差、共生和均值、共生和方差、共生和熵、共生差均值、共生差方差、共生差熵。</p>
+<p>目前，人们对遥感影像上的纹理特征的含义理解不尽相同，纹理有时被称为结构、影纹和纹形等。Pickett认为纹理为保持一定的特征重复性并且间隔规律可以任意安排的空间结构。HawKins认为[6]纹理具有三大标志:某种局部序列性不断重复、非随机排列和纹理区域内大致为均匀的统一体。LiWang和D. C. He认为[7]，纹理是纹理基元组成的，纹理基元被认为是表现纹理特征的最小单元，是一个像元在</p>
+<p>其周围8个方向上的特征反应。纹理特征有时是明显的，以某种基本图形在某一地区有规律的周期性出现，例如:大面积森林覆盖地区的影像构成的纹理为斑点状，沙漠地区的影像构成的纹理为链状、新月状等;而有时纹理特征是不明显的、隐晦的，具有不稳定性。一般来说，前者纹理比较均一，后者纹理比较复杂[9]。</p>
+<p>纹理作为一种区域特征，是对于图像各像元之间空间分布的一种描述。由于纹理能充分利用图像信息，无论从理论上或常识出发它都可以成为描述与识别图像的重要依据，与其他图像特征相比，它能更好地兼顾图像宏观性质与细微结构两个方面，因此纹理成为目标识别需要提取的重要特征。提取纹理特征的方法很多，如基于局部统计特性的特征、基于随机场模型的特征、基于空间频率的特征、分形特征等，其中，应用最广泛的是基于灰值共生矩阵的特征[10]。</p>
+<pre><code>%<span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span>
+% 图像检索——纹理特征
+%基于共生矩阵纹理特征提取，d=1,θ=0°,45°,90°,135°共四个矩阵
+%所用图像灰度级均为256
+%参考《基于颜色空间和纹理特征的图像检索》
+%function : T=Texture(Image)
+%Image : 输入图像数据
+%T : 返回八维纹理特征行向量
+%<span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span><span class="keyword">*</span>
+function T = Texture(path)
+Image = imread(path);
+
+% [M,N,O] = size(Image);
+M = 256;
+N = 256;
+if isrgb(Image)%判断是否是RGB
+Gray=rgb2gray(Image);
+end
+%————————————————————————–
+%1.将各颜色分量转化为灰度
+%————————————————————————–
+%Gray = double(0.3<span class="keyword">*</span>Image(:,:,1)+0.59<span class="keyword">*</span>Image(:,:,2)+0.11<span class="keyword">*</span>Image(:,:,3))
+
+%————————————————————————–
+%2.为了减少计算量，对原始图像灰度级压缩，将Gray量化成16级
+%————————————————————————–
+for i = 1:M
+for j = 1:N
+for n = 1:256/16
+if (n-1)<span class="keyword">*</span>16<span class="variable">&lt;=Gray(i,j)&amp;Gray(i,j)&lt;=(n-1)*16+15
+Gray(i,j) = n-1;
+end
+end
+end
+end
+
+%--------------------------------------------------------------------------
+%3.计算四个共生矩阵P,取距离为1，角度分别为0,45,90,135
+%--------------------------------------------------------------------------
+P = zeros(16,16,4);
+for m = 1:16
+for n = 1:16
+for i = 1:M
+for j = 1:N
+if j P(m,n,1) = P(m,n,1)+1;
+P(n,m,1) = P(m,n,1);
+end
+if i&gt;</span>1&amp;j P(m,n,2) = P(m,n,2)+1;
+P(n,m,2) = P(m,n,2);
+end
+if i P(m,n,3) = P(m,n,3)+1;
+P(n,m,3) = P(m,n,3);
+end
+if i P(m,n,4) = P(m,n,4)+1;
+P(n,m,4) = P(m,n,4);
+end
+end
+end
+if m==n
+P(m,n,:) = P(m,n,:)<span class="keyword">*</span>2;
+end
+end
+end
+
+%%---------------------------------------------------------
+% 对共生矩阵归一化
+%%---------------------------------------------------------
+for n = 1:4
+P(:,:,n) = P(:,:,n)/sum(sum(P(:,:,n)));
+end
+
+%--------------------------------------------------------------------------
+%4.对共生矩阵计算能量、熵、惯性矩、相关4个纹理参数
+%--------------------------------------------------------------------------
+H = zeros(1,4);
+I = H;
+Ux = H; Uy = H;
+deltaX= H; deltaY = H;
+C =H;
+for n = 1:4
+E(n) = sum(sum(P(:,:,n).^2)); %%能量
+for i = 1:16
+for j = 1:16
+if P(i,j,n)~=0
+H(n) = -P(i,j,n)<span class="keyword">*</span>log(P(i,j,n))+H(n); %%熵
+end
+I(n) = (i-j)^2<span class="keyword">*</span>P(i,j,n)+I(n); %%惯性矩
+
+Ux(n) = i<span class="keyword">*</span>P(i,j,n)+Ux(n); %相关性中μx
+Uy(n) = j<span class="keyword">*</span>P(i,j,n)+Uy(n); %相关性中μy
+end
+end
+end
+for n = 1:4
+for i = 1:16
+for j = 1:16
+deltaX(n) = (i-Ux(n))^2<span class="keyword">*</span>P(i,j,n)+deltaX(n); %相关性中σx
+deltaY(n) = (j-Uy(n))^2<span class="keyword">*</span>P(i,j,n)+deltaY(n); %相关性中σy
+C(n) = i<span class="keyword">*</span>j<span class="keyword">*</span>P(i,j,n)+C(n);
+end
+end
+C(n) = (C(n)-Ux(n)<span class="keyword">*</span>Uy(n))/deltaX(n)/deltaY(n); %相关性
+end
+
+%--------------------------------------------------------------------------
+%求能量、熵、惯性矩、相关的均值和标准差作为最终8维纹理特征
+%--------------------------------------------------------------------------
+T(1) = mean(E); T(2) = sqrt(cov(E));
+T(3) = mean(H); T(4) = sqrt(cov(H));
+T(5) = mean(I); T(6) = sqrt(cov(I));
+T(7) = mean(C); T(8) = sqrt(cov(C));
+</code></pre>  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/matlab/">matlab</a><a href="/tags/算法/">算法</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/算法/">算法</a>
+</div>
+
+
+
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2014/05/15/点到斜椭圆最小距离/" title="任意点到斜椭圆最小距离">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  任意点到斜椭圆最小距离</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2014/05/04/Gray-level Co-occurrence Matrix 灰度共生矩阵/"  title="Gray-level Co-occurrence Matrix 灰度共生矩阵">
+ <strong>NEXT:</strong><br/> 
+ <span>Gray-level Co-occurrence Matrix 灰度共生矩阵
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+<div id="asidepart">
+
+<aside class="clearfix">
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Copyright  © 2015 
+		snail
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>

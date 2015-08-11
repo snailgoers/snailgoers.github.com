@@ -1,0 +1,293 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>根据旋转前后向量求旋转矩阵 | Opengcl</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="snailgoers">
+    
+    <meta name="description" content="如果已知旋转前后向量的变化，如何求旋转矩阵呢？1、旋转角度：已经旋转前向量P及旋转后向量Q，由点积定义可知
+P.Q =|P| |Q| cos(theta)
+2、旋转轴：由上可知，旋转角所在平面为P和Q构成的平面，那么旋转轴必定垂直于该平面，
+A X B =(a2b3-a3b2)i + (a3b1-a">
+    
+    
+    <meta name="keywords" content="算法设计学习分享,图像处理,计算几何,通用计算库">
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Opengcl">Opengcl</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/algorithm">Alogrithm</a></li>
+					
+						<li><a href="/application">App</a></li>
+					
+						<li><a href="/life">Life</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:opengcl.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/08/15/根据旋转前后向量确定旋转矩阵/" title="根据旋转前后向量求旋转矩阵" itemprop="url">根据旋转前后向量求旋转矩阵</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://opengcl.com" title="snailgoers">snailgoers</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2014-08-15T04:44:29.000Z" itemprop="datePublished">Aug 15 2014</time>
+    更新日期:<time datetime="2015-01-30T08:33:00.000Z" itemprop="dateModified">Jan 30 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<p>如果已知旋转前后向量的变化，如何求旋转矩阵呢？<br>1、旋转角度：已经旋转前向量P及旋转后向量Q，由点积定义可知</p>
+<pre><code>P.Q =|<span class="string">P</span>|<span class="string"> </span>|<span class="string">Q</span>|<span class="string"> cos(theta)</span>
+</code></pre><p>2、旋转轴：由上可知，旋转角所在平面为P和Q构成的平面，那么旋转轴必定垂直于该平面，</p>
+<pre><code>A X B =<span class="list">(<span class="keyword">a2b3-a3b2</span>)</span>i + <span class="list">(<span class="keyword">a3b1-a1b3</span>)</span>j + <span class="list">(<span class="keyword">a1b2-a2b1</span>)</span>k
+</code></pre><p>3、根据罗德里格旋转公式求旋转矩阵</p>
+<p><img src="http://snailgoers.qiniudn.com/rodrigues (1" alt="罗德里格旋转公式">.png)</p>
+<p>4、Code</p>
+<pre><code><span class="function"><span class="keyword">function</span> <span class="title">RotateMatrix</span>=</span>F_GetRotateMatrix<span class="params">(vectsrc,vectdst)</span>
+
+angle=<span class="built_in">acos</span><span class="params">(dot<span class="params">(vectsrc,vectdst)</span>)</span>;
+vector=<span class="built_in">cross</span><span class="params">(vectsrc,vectdst)</span>;
+
+
+<span class="built_in">%</span> normalization
+vector=vector/<span class="built_in">norm</span><span class="params">(vector)</span>;
+
+cost=<span class="built_in">cos</span><span class="params">(angle)</span>;sint=<span class="built_in">sin</span><span class="params">(angle)</span>;
+x=vector<span class="params">(<span class="number">1</span>)</span>;y=vector<span class="params">(<span class="number">2</span>)</span>;z=vector<span class="params">(<span class="number">3</span>)</span>;
+
+<span class="built_in">%</span><span class="built_in">rotate</span> matrix
+RotateMatrix=[x<span class="built_in">*</span>x<span class="built_in">*</span><span class="params">(<span class="number">1</span>-cost)</span>+cost <span class="params">(<span class="number">1</span>-cost)</span><span class="built_in">*</span>x<span class="built_in">*</span>y-sint<span class="built_in">*</span>z <span class="params">(<span class="number">1</span>-cost)</span><span class="built_in">*</span>x<span class="built_in">*</span>z+sint<span class="built_in">*</span>y;
+<span class="params">(<span class="number">1</span>-cost)</span><span class="built_in">*</span>y<span class="built_in">*</span>x+sint<span class="built_in">*</span>z <span class="params">(<span class="number">1</span>-cost)</span><span class="built_in">*</span>y<span class="built_in">*</span>y+cost <span class="params">(<span class="number">1</span>-cost)</span><span class="built_in">*</span>y<span class="built_in">*</span>z-sint<span class="built_in">*</span>x;
+<span class="params">(<span class="number">1</span>-cost)</span><span class="built_in">*</span>z<span class="built_in">*</span>x-sint<span class="built_in">*</span>y <span class="params">(<span class="number">1</span>-cost)</span><span class="built_in">*</span>z<span class="built_in">*</span>y+sint<span class="built_in">*</span>x <span class="params">(<span class="number">1</span>-cost)</span><span class="built_in">*</span>z<span class="built_in">*</span>z+cost];
+</code></pre>  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/计算几何/">计算几何</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/算法/">算法</a>
+</div>
+
+
+
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2014/08/18/vs2008替换tab空格为空格符号/" title="vs2008 将原有tab空格设置为空格符号">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  vs2008 将原有tab空格设置为空格符号</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2014/08/13/图像增强/"  title="图像预处理之：对比度增强">
+ <strong>NEXT:</strong><br/> 
+ <span>图像预处理之：对比度增强
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+<div id="asidepart">
+
+<aside class="clearfix">
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Copyright  © 2015 
+		snail
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>

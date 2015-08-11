@@ -1,0 +1,346 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>开轮廓轮轮廓跟踪 | Opengcl</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="snailgoers">
+    
+    <meta name="description" content="function out = OpenBoundaryTrack(bw)
+% 单个边缘跟踪，pstart为联通区右下方的像素点 当边缘位于边界处，无法跟踪，需将
+% 图像人为扩大2*2像素并置0，并将最后结果做边界处理
+
+bw1=zeros(size(bw)+2);
+bw1(2:end-1,2:en">
+    
+    
+    <meta name="keywords" content="算法设计学习分享,图像处理,计算几何,通用计算库">
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Opengcl">Opengcl</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/algorithm">Alogrithm</a></li>
+					
+						<li><a href="/application">App</a></li>
+					
+						<li><a href="/life">Life</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:opengcl.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/01/14/开轮廓轮廓跟踪/" title="开轮廓轮轮廓跟踪" itemprop="url">开轮廓轮轮廓跟踪</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://opengcl.com" title="snailgoers">snailgoers</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-01-14T08:36:01.000Z" itemprop="datePublished">Jan 14 2015</time>
+    更新日期:<time datetime="2015-01-14T08:37:43.000Z" itemprop="dateModified">Jan 14 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<pre><code><span class="function"><span class="keyword">function</span> <span class="title">out</span> = <span class="title">OpenBoundaryTrack</span><span class="params">(bw)</span></span>
+<span class="comment">% 单个边缘跟踪，pstart为联通区右下方的像素点 当边缘位于边界处，无法跟踪，需将</span>
+<span class="comment">% 图像人为扩大2*2像素并置0，并将最后结果做边界处理</span>
+
+bw1=<span class="built_in">zeros</span>(<span class="built_in">size</span>(bw)+<span class="number">2</span>);
+bw1(<span class="number">2</span>:<span class="keyword">end</span>-<span class="number">1</span>,<span class="number">2</span>:<span class="keyword">end</span>-<span class="number">1</span>)=bw;
+ba=BoundaryTrack(bw1);
+<span class="matrix">[row,col]</span>=<span class="built_in">size</span>(bw);
+ba=ba-<span class="number">1</span>;
+ba(<span class="built_in">find</span>(ba(:,<span class="number">1</span>)==<span class="number">1</span> | ba(:,<span class="number">1</span>) == col | ba(:,<span class="number">2</span>)== <span class="number">1</span> | ba(:,<span class="number">2</span>)== row),:)=<span class="matrix">[]</span>;
+<span class="comment">% 寻找最大距离为开始点</span>
+<span class="matrix">[~,dex]</span>=max(sum((ba(<span class="number">1</span>:<span class="keyword">end</span>-<span class="number">1</span>,:)-ba(<span class="number">2</span>:<span class="keyword">end</span>,:)).^<span class="number">2</span>,<span class="number">2</span>));
+out=<span class="matrix">[ba(dex+<span class="number">1</span>:end,:);ba(<span class="number">1</span>:dex,:)]</span>;
+
+
+<span class="function"><span class="keyword">function</span> <span class="title">pt</span> =<span class="title">BoundaryTrack</span><span class="params">(bw,pstart,pend)</span></span>
+<span class="comment">% 单个边缘跟踪，pstart为联通区右下方的像素点 当边缘位于边界处，无法跟踪，需将</span>
+<span class="comment">% 图像人为扩大2*2像素并置0，并将最后结果做边界处理</span>
+<span class="matrix">[row, col]</span>= <span class="built_in">size</span>(bw);
+<span class="keyword">if</span> ~exist(<span class="string">'pstart'</span>,<span class="string">'var'</span>)
+    <span class="keyword">for</span> <span class="built_in">i</span>=<span class="number">1</span>:row
+        <span class="keyword">for</span> <span class="built_in">j</span>=<span class="number">1</span>:col
+            <span class="keyword">if</span> bw(<span class="built_in">i</span>,<span class="built_in">j</span>)~=<span class="number">0</span>
+                pstart.y = <span class="built_in">i</span>;
+                pstart.x = <span class="built_in">j</span>;
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+<span class="keyword">if</span> ~exist(<span class="string">'pend'</span>,<span class="string">'var'</span>)
+    pend=pstart;
+<span class="keyword">end</span>
+
+<span class="comment">%%</span>
+k=<span class="number">0</span>;
+flag = <span class="number">1</span>;
+ptcurrent = pstart;
+off=<span class="matrix">[<span class="number">1</span> <span class="number">0</span>; <span class="number">1</span> <span class="number">1</span>; <span class="number">0</span> <span class="number">1</span>; -<span class="number">1</span> <span class="number">1</span>; -<span class="number">1</span> <span class="number">0</span>; -<span class="number">1</span> -<span class="number">1</span>; <span class="number">0</span> -<span class="number">1</span>; <span class="number">1</span> -<span class="number">1</span>]</span>;
+
+pt=<span class="matrix">[pstart.x pstart.y]</span>;
+<span class="keyword">while</span> flag
+flag = <span class="number">0</span>;   
+<span class="keyword">for</span> <span class="built_in">i</span> =<span class="number">1</span>:<span class="number">8</span>
+    k=bitand(k,<span class="number">7</span>);
+    x = ptcurrent.x + off(k+<span class="number">1</span>,<span class="number">1</span>);
+    y = ptcurrent.y + off(k+<span class="number">1</span>,<span class="number">2</span>);
+
+    <span class="keyword">if</span> x&gt;=<span class="number">1</span> &amp;&amp; x &lt;=col &amp;&amp; y&gt;=<span class="number">1</span> &amp;&amp; y &lt;=row
+        <span class="keyword">if</span> bw(y,x)
+            <span class="keyword">for</span> <span class="built_in">j</span> = <span class="number">1</span>:<span class="number">2</span>:<span class="number">8</span>
+                ptemp.x = x + off(<span class="built_in">j</span>,<span class="number">1</span>);
+                ptemp.y = y + off(<span class="built_in">j</span>,<span class="number">2</span>);
+                <span class="keyword">if</span> ptemp.x &gt;=<span class="number">1</span> &amp;&amp; ptemp.x &lt;=col &amp;&amp; ptemp.y &gt;=<span class="number">1</span> &amp;&amp; ptemp.y &lt;=row
+                    <span class="keyword">if</span> bw(ptemp.y, ptemp.x) == <span class="number">0</span>
+                        flag = <span class="number">1</span>;
+                        ptcurrent.x = x;
+                        ptcurrent.y = y;
+                        pt=<span class="matrix">[pt;x y]</span>;
+                        <span class="keyword">break</span>;
+                    <span class="keyword">end</span>
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+    <span class="keyword">if</span> flag
+        <span class="keyword">if</span> pend.x == ptcurrent.x &amp;&amp; pend.y == ptcurrent.y 
+            flag = <span class="number">0</span>;
+        <span class="keyword">end</span>
+        <span class="keyword">break</span>;
+    <span class="keyword">end</span>
+    k = k +<span class="number">1</span>;
+<span class="keyword">end</span>
+k = k + <span class="number">6</span>;
+<span class="keyword">end</span>
+</code></pre>  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/轮廓跟踪/">轮廓跟踪</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/图像处理/">图像处理</a>
+</div>
+
+
+
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/01/14/点云看空间曲线的微分信息计算方法/" title="Frenet标架及曲率挠率计算">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  Frenet标架及曲率挠率计算</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/01/14/只有旋转和平移的空间变换推导/"  title="只有旋转和平移的变换矩阵推导">
+ <strong>NEXT:</strong><br/> 
+ <span>只有旋转和平移的变换矩阵推导
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+<div id="asidepart">
+
+<aside class="clearfix">
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Copyright  © 2015 
+		snail
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>

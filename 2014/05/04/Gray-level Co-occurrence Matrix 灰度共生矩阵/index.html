@@ -1,0 +1,290 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Gray-level Co-occurrence Matrix 灰度共生矩阵 | Opengcl</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="snailgoers">
+    
+    <meta name="description" content="灰度共生矩阵就是一种通过研究灰度的空间相关特性来描述纹理的常用方法。灰度共生矩阵是对图像上保持某距离的两象素分别具有某灰度的状况进行统计得到的。
+取图像(N×N)中任意一点（x，y）及偏离它的另一点（x+a，y+b），设该点对的灰度值为（g1，g2）。令点（x，y）在整个画面上移动，则会得到各种（g1，g2）。值，设灰度值的级数为，则（g1，g2）。的组合共有 k2种。对于整个画面，统计出每一种（g1，g2）值出现的次数，然后排列成一个方阵，在用（g1，g2）出现的总次数将它们归一化为出现的概率P（g1，g2），这样的方阵称为灰度共生矩阵。距离差分值（a，b）取不同的数值组合，可以得到不同情况下的联合概率矩阵。（a，b）取值要根据纹理周期分布的特性来选择，对于较细的纹理，选取（1，0）、（1，1）、（2，0）等小的差分值。">
+    
+    
+    <meta name="keywords" content="算法设计学习分享,图像处理,计算几何,通用计算库">
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Opengcl">Opengcl</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/algorithm">Alogrithm</a></li>
+					
+						<li><a href="/application">App</a></li>
+					
+						<li><a href="/life">Life</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:opengcl.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/05/04/Gray-level Co-occurrence Matrix 灰度共生矩阵/" title="Gray-level Co-occurrence Matrix 灰度共生矩阵" itemprop="url">Gray-level Co-occurrence Matrix 灰度共生矩阵</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://opengcl.com" title="snailgoers">snailgoers</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2014-05-04T05:19:31.000Z" itemprop="datePublished">May 4 2014</time>
+    更新日期:<time datetime="2014-09-01T01:45:45.000Z" itemprop="dateModified">Sep 1 2014</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<p>灰度共生矩阵就是一种通过研究灰度的空间相关特性来描述纹理的常用方法。<br>灰度共生矩阵是对图像上保持某距离的两象素分别具有某灰度的状况进行统计得到的。</p>
+<p>取图像(N×N)中任意一点（x，y）及偏离它的另一点（x+a，y+b），设该点对的灰度值为（g1，g2）。令点（x，y）在整个画面上移动，则会得到各种（g1，g2）。值，设灰度值的级数为，则（g1，g2）。的组合共有 k2种。对于整个画面，统计出每一种（g1，g2）值出现的次数，然后排列成一个方阵，在用（g1，g2）出现的总次数将它们归一化为出现的概率P（g1，g2），这样的方阵称为灰度共生矩阵。距离差分值（a，b）取不同的数值组合，可以得到不同情况下的联合概率矩阵。（a，b）取值要根据纹理周期分布的特性来选择，对于较细的纹理，选取（1，0）、（1，1）、（2，0）等小的差分值。</p>
+<a id="more"></a>
+<p>为了能更直观地以共生矩阵描述纹理状况，从共生矩阵导出一些反映矩阵状况的参数，典型的有以下几种:</p>
+<ul>
+<li><p>能量：是灰度共生矩阵元素值的平方和，所以也称能量，反映了图像灰度分布均匀程度和纹理粗细度。如果共生矩阵的所有值均相等，则ASM值小；相反， 如果其中一些值大而其它值小，则ASM值大。当共生矩阵中元素集中分布时，此时ASM值大。ASM值大表明一种较均一和规则变化的纹理模式。</p>
+</li>
+<li><p>对比度：反映了图像的清晰度和纹理沟纹深浅的程度。纹理沟纹越深，其对比度越大，视觉效果越清晰；反之，对比度小，则沟纹浅，效果模糊。灰度差即对比度大的象素对越多，这个值越大。灰度公生矩阵中远离对角线的元素值越大，CON越大。</p>
+</li>
+<li><p>相关：它度量空间灰度共生矩阵元素在行或列方向上的相似程度，因此，相关值大小反映了图像中局部灰度相关性。当矩阵元素值均匀相等时，相关值就大； 相反，如果矩阵像元值相差很大则相关值小。如果图像中有水平方向纹理，则水平方向矩阵的COR大于其余矩阵的COR值。</p>
+</li>
+<li><p>熵：是图像所具有的信息量的度量，纹理信息也属于图像的信息，是一个随机性的度量，当共生矩阵中所有元素有最大的随机性、空间共生矩阵中所有值几乎相等时，共生矩阵中元素分散分布时，熵较大。它表示了图像中纹理的非均匀程度或复杂程度。</p>
+</li>
+<li><p>逆差距： 反映图像纹理的同质性，度量图像纹理局部变化的多少。其值大则说明图像纹理的不同区域间缺少变化，局部非常均匀。</p>
+</li>
+</ul>
+<p>其它参数:中值<mean>、协方差<variance>、同质性/逆差距<homogeneity>、反差 <contrast>、差异性<dissimilarity>、熵<entropy>、二阶距&lt; Angular Second Moment&gt;、自相关<correlation></correlation></entropy></dissimilarity></contrast></homogeneity></variance></mean></p>
+<pre><code><span class="keyword">image</span>=imread(<span class="string">'F:/1021-4.bmp'</span>);
+        <span class="variable">%计</span>算图像的灰度共生矩阵
+[glcms,SI]=graycomatrix(<span class="keyword">image</span>);
+        <span class="variable">%计</span>算图像的灰度共生矩阵
+stats = graycoprops(glcms,<span class="string">'Contrast Correlation energy'</span>)
+</code></pre>  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/matlab/">matlab</a><a href="/tags/算法/">算法</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/算法/">算法</a>
+</div>
+
+
+
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2014/05/04/灰度共生矩阵/" title="灰度共生矩阵（GLCM）">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  灰度共生矩阵（GLCM）</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2014/05/04/使用matlab进行usb摄像头编程/"  title="使用MATLAB进行USB摄像头的编程">
+ <strong>NEXT:</strong><br/> 
+ <span>使用MATLAB进行USB摄像头的编程
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+<div id="asidepart">
+
+<aside class="clearfix">
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Copyright  © 2015 
+		snail
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>

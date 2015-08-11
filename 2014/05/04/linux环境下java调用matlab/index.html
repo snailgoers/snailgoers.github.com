@@ -1,0 +1,286 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>linux 环境下调用matlab小结 | Opengcl</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="snailgoers">
+    
+    <meta name="description" content="由于工作需要，需在linux环境下用java调用matlab，此中遇到诸多问题，现记录下来，以备不日之需
+##安装虚拟机##我用的是vmware workstation 9.10版本，linux版本用到的是centOS6.0 64位系统，安装开发者界面，这样可以免除安装eclipse的繁琐，但是也有问题，这个后面介绍。
+##安装matlab##此版本我用的是matlab2011b版本，这一切相信大家都会安装比较顺利，不多说啦，最主要也是最要命的要属于系统配置了
+##安装jdk#在cmd输入“java -version” 后，确实显示了java的相关信息，咨询同事后也说jdk是安装好的，默认安装的是1.6，但是我却找不到那该死的jdk安装的目录，也就没有办法配置JAVA_HOME了，后来不得已从www.sun.com下载了1.6版本的jdk，重新安装，很简单，现在版本是1.7的，为什么没有安装1.7呢，也是之前安装1.7出现了jdk跟eslipse中的不一致，eslipse中的是1.6的，编译出现问题，才安装的1.6安装之后，需要配置一下java_home等相关变量，共三个如下:">
+    
+    
+    <meta name="keywords" content="算法设计学习分享,图像处理,计算几何,通用计算库">
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Opengcl">Opengcl</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/algorithm">Alogrithm</a></li>
+					
+						<li><a href="/application">App</a></li>
+					
+						<li><a href="/life">Life</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:opengcl.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/05/04/linux环境下java调用matlab/" title="linux 环境下调用matlab小结" itemprop="url">linux 环境下调用matlab小结</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://opengcl.com" title="snailgoers">snailgoers</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2014-05-04T04:32:59.000Z" itemprop="datePublished">May 4 2014</time>
+    更新日期:<time datetime="2015-01-30T08:34:34.000Z" itemprop="dateModified">Jan 30 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<p>由于工作需要，需在linux环境下用java调用matlab，此中遇到诸多问题，现记录下来，以备不日之需</p>
+<p>##安装虚拟机##<br>我用的是vmware workstation 9.10版本，linux版本用到的是centOS6.0 64位系统，安装开发者界面，这样可以免除安装eclipse的繁琐，但是也有问题，这个后面介绍。</p>
+<p>##安装matlab##<br>此版本我用的是matlab2011b版本，这一切相信大家都会安装比较顺利，不多说啦，最主要也是最要命的要属于系统配置了</p>
+<p>##安装jdk#<br>在cmd输入“java -version” 后，确实显示了java的相关信息，咨询同事后也说jdk是安装好的，默认安装的是1.6，但是我却找不到那该死的jdk安装的目录，也就没有办法配置JAVA_HOME了，后来不得已从www.sun.com下载了1.6版本的jdk，重新安装，很简单，现在版本是1.7的，为什么没有安装1.7呢，也是之前安装1.7出现了jdk跟eslipse中的不一致，eslipse中的是1.6的，编译出现问题，才安装的1.6安装之后，需要配置一下java_home等相关变量，共三个如下:<br><a id="more"></a></p>
+<pre><code>[root@<span class="built_in">test</span> src]<span class="comment"># vi /etc/profile</span>
+<span class="built_in">export</span> JAVA_HOME=/usr/java/jdk1.<span class="number">7.0</span>_05
+<span class="built_in">export</span> CLASSPATH=.:<span class="variable">$JAVA_HOME</span>/lib/dt.jar:<span class="variable">$JAVA_HOME</span>/lib/tools.jar
+<span class="built_in">export</span> PATH=<span class="variable">$PATH</span>:<span class="variable">$JAVA_HOME</span>/bin
+</code></pre><p>之后输入 “. /etc/profile”可以在不重启电脑情况下可以使环境变量生效，上面的目录及版本相应改一下就可以了，此时在你的matlab中输入 “getenv JAVA_HOME”应该能得到JAVA_HOME的路径的，这是你就可以编译你的m文件成jar了，办法网上很多，不再熬述。<br>在作了这下工作后，结果还是发现一个问题，如下所示：</p>
+<pre><code>org.apache.jasper.JasperException: javax.servlet.ServletException: java.lang.UnsatisfiedLinkError: Failed <span class="keyword">to</span> find <span class="keyword">the</span> library libmwmclmcrrt.so<span class="number">.7</span><span class="number">.15</span>, required <span class="keyword">by</span> MATLAB Builder JA, <span class="function_start"><span class="keyword">on</span></span> java.library.path.
+This library <span class="keyword">is</span> typically installed along <span class="keyword">with</span> MATLAB <span class="keyword">or</span> <span class="keyword">the</span> MCR, <span class="keyword">its</span> absence may indicate an issue <span class="keyword">with</span> <span class="keyword">that</span> installation <span class="keyword">or</span> <span class="keyword">the</span> current path configuration.
+The MCR <span class="property">version</span> <span class="keyword">that</span> this component <span class="keyword">is</span> trying <span class="keyword">to</span> use <span class="keyword">is</span>: <span class="number">7.15</span>.
+</code></pre><p>相信很多人都碰到过，者其实是还有一个变量你没有配置好，那就是LD_LIBRARY_PATH和XAPPLRESDIR<br>加入如下环境变量，路径按照你自己的来改就可以了。</p>
+<pre><code>LD_LIBRARY_PATH=<span class="regexp">/usr/</span>local<span class="regexp">/MATLAB/</span>R2011b<span class="regexp">/bin/</span>glnxa64
+XAPPLRESDIR=<span class="regexp">/usr/</span>local<span class="regexp">/MATLAB/</span>R2011b<span class="regexp">/X11/</span>app-defaults
+LD_PATH=<span class="regexp">/usr/</span>local<span class="regexp">/MATLAB/</span>R2011b<span class="regexp">/runtime/</span>glnxa64
+
+export LD_LIBRARY_PATH
+export XAPPLRESDIR
+LD_LIBRARY_PATH=<span class="string">$LD_PATH:</span>$LD_LIBRARY_PATH
+</code></pre><p>至此，再调试，结果出来了，哈哈，再有什么问题在一个个解决就ok了，祝你好运</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/java/">java</a><a href="/tags/matlab/">matlab</a>
+  </div>
+
+
+
+
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2014/05/04/p分位法图像二值化/" title="p分位法图像二值化">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  p分位法图像二值化</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2014/05/04/libsvm之 svmpredict 输出概率/"  title="Libsvm 之svmpredict 输出概率">
+ <strong>NEXT:</strong><br/> 
+ <span>Libsvm 之svmpredict 输出概率
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+<div id="asidepart">
+
+<aside class="clearfix">
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Copyright  © 2015 
+		snail
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>

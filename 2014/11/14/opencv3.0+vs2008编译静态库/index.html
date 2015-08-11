@@ -1,0 +1,274 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>opencv3.0 vs2008 编译静态库 | Opengcl</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="snailgoers">
+    
+    <meta name="description" content="最近因工作需要，需要编译64位的opencv静态lib库，由于之前一直用dll文件，这次还是走了不少弯路，用多长时间，就不说了，不好意思，也主要自己对微软的东西不是很感冒，好久搞不明白，这里坐下备注，防止日后再用到找不到。先说环境吧，vs2008因为一直都在用，不像换新的，所以这次还是在vs2008">
+    
+    
+    <meta name="keywords" content="算法设计学习分享,图像处理,计算几何,通用计算库">
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Opengcl">Opengcl</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/algorithm">Alogrithm</a></li>
+					
+						<li><a href="/application">App</a></li>
+					
+						<li><a href="/life">Life</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:opengcl.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/11/14/opencv3.0+vs2008编译静态库/" title="opencv3.0 vs2008 编译静态库" itemprop="url">opencv3.0 vs2008 编译静态库</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://opengcl.com" title="snailgoers">snailgoers</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2014-11-14T07:06:45.000Z" itemprop="datePublished">Nov 14 2014</time>
+    更新日期:<time datetime="2015-01-30T08:33:38.000Z" itemprop="dateModified">Jan 30 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<p>最近因工作需要，需要编译64位的opencv静态lib库，由于之前一直用dll文件，这次还是走了不少弯路，用多长时间，就不说了，不好意思，也主要自己对微软的东西不是很感冒，好久搞不明白，这里坐下备注，防止日后再用到找不到。<br>先说环境吧，vs2008因为一直都在用，不像换新的，所以这次还是在vs2008平台下编译，opencv采用最新的<a href="www.opencv.org">opencv3.0 beta</a>版本，cmake也是采用最新的<a href="www.cmake.org">cmake3.1.0-rc2</a>，</p>
+<p>cmake编译源代码如下</p>
+<p><img src="http://snailgoers.qiniudn.com/cmake.jpg" alt="cmake"></p>
+<p>###cMake<br>编译静态库，主要的一项就是BUILD_SHARED_LIBS，这个东西我觉得名字有点怪，选了它编译出来的是dll，反之是lib，让人不得其解，其他的诸如BUILD_EXAMPLE,BUILD_TEST,BUILD_PERF_TEST,都可以不编译，还有一项，BUILD_OPENCV_WORLD，这是很好玩的，之前添加lib库文件，需要添加一大堆，现在如果选择了这一项，一个lib可以替代之前的一大堆lib了，甚是方便，推荐使用，其他的可以根据自己需要选择或去除了，反正我也不懂，呵呵，就都默认了。最后加一句，在编译64位lib时，只需要第一步选择不同的编译器就行了，如上图所示就是编译的64位lib。</p>
+<p>###编译opencv<br>这个没什么可说的，在Solution上右键Rebuild即可，然后INSTALLbuild即可完成编译，</p>
+<p>###opencv测试代码<br>其实这一步是最纠结的，因为没有用过静态库，所以除了不少岔子，甚是窝火，编译就是400多个错误，<br>我编译出来的lib文件如下图所示：</p>
+<p><img src="http://snailgoers.qiniudn.com/opencvLib.jpg" alt="lib"><br>在我link里面添加了诸多lib后，还是除了很多error，可以上图看到一个编译时间跟别人不一样的，ippicvmt.lib就是他了，这个也要加上，要不很多错，到这里，几乎上就可以了，可还有最后一个没有添加上，网上搜索相应错误，添加comctl32.lib不知道是啥东西，反正是可以了，而且x86和x64都是这个文件，到现在为止，一切都已ok，编译的程序也可以脱离VS和opencv独立运行了，希望其他童鞋看到这个能少走弯路吧！</p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/opencv/">opencv</a><a href="/tags/vs2008/">vs2008</a><a href="/tags/静态lib/">静态lib</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/应用/">应用</a>
+</div>
+
+
+
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2014/12/23/C++野指针编译错误/" title="c++野指针释放出错">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  c++野指针释放出错</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2014/11/10/最大子数组求解/"  title="最大子数组求解">
+ <strong>NEXT:</strong><br/> 
+ <span>最大子数组求解
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+<div id="asidepart">
+
+<aside class="clearfix">
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Copyright  © 2015 
+		snail
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>

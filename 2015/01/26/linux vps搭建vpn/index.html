@@ -1,0 +1,343 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>Linux Vps 搭建Vpn | Opengcl</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="snailgoers">
+    
+    <meta name="description" content="最近因为一直在整理自己的bolg，申请了新的域名，如域名所说，开源通用计算库，有点大，但是自己一直都在努力，将自己学习到的、用到的一些知识分享给所有感兴趣的朋友，遇到问题，还请多提意见。出于爱好，最近又买了一个vps，很mini的，当然价格很便宜，一年9刀，玩玩足矣，一是搭建一个vpn，用于查资料，">
+    
+    
+    <meta name="keywords" content="算法设计学习分享,图像处理,计算几何,通用计算库">
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Opengcl">Opengcl</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/algorithm">Alogrithm</a></li>
+					
+						<li><a href="/application">App</a></li>
+					
+						<li><a href="/life">Life</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:opengcl.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/01/26/linux vps搭建vpn/" title="Linux Vps 搭建Vpn" itemprop="url">Linux Vps 搭建Vpn</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://opengcl.com" title="snailgoers">snailgoers</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-01-26T07:03:02.000Z" itemprop="datePublished">Jan 26 2015</time>
+    更新日期:<time datetime="2015-01-30T08:33:35.000Z" itemprop="dateModified">Jan 30 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<p>最近因为一直在整理自己的bolg，<a href="opengcl.com">申请了新的域名</a>，如域名所说，开源通用计算库，有点大，但是自己一直都在努力，将自己学习到的、用到的一些知识分享给所有感兴趣的朋友，遇到问题，还请多提意见。出于爱好，最近又买了一个vps，很mini的，当然价格很便宜，一年9刀，玩玩足矣，一是搭建一个vpn，用于查资料，另一个目的就是把自己的博客也迁移过去，顺便迁移到wordpress上面，一直在用hexo，感觉到随着bolg的增容会越来越慢，更关键的是没有电脑无法更新博客，也许wordpress是个不错的选择。<br>下面这多是在linux centos6.0 32位机器上搭建vpn的过程</p>
+<p>###代码</p>
+<pre><code>yum remove -y pptpd ppp
+/etc/init.d/iptables stop
+rm -rf /etc/pptpd.conf
+rm -rf /etc/ppp
+depmod <span class="operator">-a</span>
+service iptables start
+iptables -F
+iptables --flush POSTROUTING --table nat
+iptables --flush FORWARD
+
+wget http://myvps-scripts.googlecode.com/files/dkms-<span class="number">2.0</span>.<span class="number">17.5</span>-<span class="number">1</span>.noarch.rpm
+wget http://myvps-scripts.googlecode.com/files/pptpd-<span class="number">1.3</span>.<span class="number">4</span>-<span class="number">1</span>.rhel5.<span class="number">1</span>.i386.rpm
+wget http://myvps-scripts.googlecode.com/files/ppp-<span class="number">2.4</span>.<span class="number">4</span>-<span class="number">9.0</span>.rhel5.i386.rpm
+wget ftp://ftp.muug.mb.ca/mirror/centos/<span class="number">5.11</span>/os/x86_64/CentOS/libpcap-<span class="number">0.9</span>.<span class="number">4</span>-<span class="number">15</span>.el5.i386.rpm
+rpm -ivh libpcap-<span class="number">0.9</span>.<span class="number">4</span>-<span class="number">15</span>.el5.i386.rpm
+yum -y install make iptables gcc-c++ logrotate tar cpio perl pam tcp_wrappers
+rpm -ivh dkms-<span class="number">2.0</span>.<span class="number">17.5</span>-<span class="number">1</span>.noarch.rpm
+<span class="comment">#rpm -ivh kernel_ppp_mppe-1.0.2-3dkms.noarch.rpm</span>
+<span class="comment">#rpm -qa kernel_ppp_mppe</span>
+rpm -Uvh ppp-<span class="number">2.4</span>.<span class="number">4</span>-<span class="number">9.0</span>.rhel5.i386.rpm
+rpm -ivh pptpd-<span class="number">1.3</span>.<span class="number">4</span>-<span class="number">1</span>.rhel5.<span class="number">1</span>.i386.rpm
+
+<span class="comment">#modprobe ppp_mppe</span>
+
+mknod /dev/ppp c <span class="number">108</span> <span class="number">0</span> 
+<span class="built_in">echo</span> <span class="number">1</span> &gt; /proc/sys/net/ipv4/ip_forward 
+<span class="built_in">echo</span> <span class="string">"mknod /dev/ppp c 108 0"</span> &gt;&gt; /etc/rc.local
+<span class="built_in">echo</span> <span class="string">"echo 1 &gt; /proc/sys/net/ipv4/ip_forward"</span> &gt;&gt; /etc/rc.local
+<span class="built_in">echo</span> <span class="string">"localip 172.16.36.1"</span> &gt;&gt; /etc/pptpd.conf
+<span class="built_in">echo</span> <span class="string">"remoteip 172.16.36.2-254"</span> &gt;&gt; /etc/pptpd.conf
+<span class="built_in">echo</span> <span class="string">"ms-dns 8.8.8.8"</span> &gt;&gt; /etc/ppp/options.pptpd
+<span class="built_in">echo</span> <span class="string">"ms-dns 8.8.4.4"</span> &gt;&gt; /etc/ppp/options.pptpd
+
+pass=`openssl rand <span class="number">6</span> -base64`
+<span class="keyword">if</span> [ <span class="string">"<span class="variable">$1</span>"</span> != <span class="string">""</span> ]
+<span class="keyword">then</span> pass=<span class="variable">$1</span>
+<span class="keyword">fi</span>
+
+ip=`/sbin/ifconfig venet0 | grep <span class="string">'inet addr:'</span> | cut <span class="operator">-d</span>: <span class="operator">-f</span>2 | awk <span class="string">'{ print $1}'</span>`
+
+<span class="built_in">echo</span> <span class="string">"vpn pptpd <span class="variable">${pass}</span> *"</span> &gt;&gt; /etc/ppp/chap-secrets
+<span class="built_in">echo</span> <span class="string">"vpn1 pptpd 12345 *"</span> &gt;&gt; /etc/ppp/chap-secrets
+
+iptables -t nat -A POSTROUTING <span class="operator">-s</span> <span class="number">172.16</span>.<span class="number">36.0</span>/<span class="number">24</span> -j SNAT --to-source `ifconfig  | grep <span class="string">'inet addr:'</span>| grep -v <span class="string">'127.0.0.1'</span> | cut <span class="operator">-d</span>: <span class="operator">-f</span>2 | awk <span class="string">'NR==1 { print $1}'</span>`
+iptables -A FORWARD -p tcp --syn <span class="operator">-s</span> <span class="number">172.16</span>.<span class="number">36.0</span>/<span class="number">24</span> -j TCPMSS --set-mss <span class="number">1356</span>
+service iptables save
+
+chkconfig iptables on
+chkconfig pptpd on
+
+service iptables start
+service pptpd start
+
+
+<span class="built_in">echo</span> <span class="string">"==============================================================================="</span>
+<span class="built_in">echo</span> <span class="string">" VPN INSTALLATION COMPLETE"</span>
+<span class="built_in">echo</span> <span class="string">"==============================================================================="</span>
+<span class="built_in">echo</span> <span class="string">" "</span>
+<span class="built_in">echo</span> <span class="string">"VPN hostname/ip: <span class="variable">${ip}</span>"</span>
+<span class="built_in">echo</span> <span class="string">"VPN type: PPTP"</span>
+<span class="built_in">echo</span> <span class="string">"VPN username: vpn"</span>
+<span class="built_in">echo</span> <span class="string">"VPN password: <span class="variable">${pass}</span>"</span>
+<span class="built_in">echo</span> <span class="string">" "</span>
+<span class="built_in">echo</span> <span class="string">" "</span>
+<span class="built_in">echo</span> <span class="string">"Note: You may need to ensure the checkbox send all traffic over this connection"</span>
+<span class="built_in">echo</span> <span class="string">"the codes edit by http://www.laozuo.org/"</span>
+<span class="built_in">echo</span> <span class="string">" "</span>
+
+rm -rf *.rpm
+</code></pre><p>其实网络上有很多一键搭建vpn的，但是针对不同的vps供应商及不同的平台，或多好少会有不同，这就需要你去修改哪些不合适的，在搭建vpn的过程中也出现了很多问题，</p>
+<ul>
+<li>libpcap版本不匹配，如你说看到的，我在上面代码中，修改yum安装libpcap为固定版本，这里也许有个库你很喜欢<a href="http://rpm.pbone.net/" target="_blank" rel="external">pbone.net</a>,你所需要的这里都有</li>
+<li>找不到eth0，在linux中，这是你的网卡，但是我的vps供应商采用的虚拟技术是openVZ，在用ifconfig中没有eth0，只有venet0，这是，将上面代码一行将eth0改为venet0即可，其他的没有需要修改的了，再添加一些常用用户即可</li>
+</ul>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/vpn/">vpn</a><a href="/tags/vps/">vps</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/网络/">网络</a>
+</div>
+
+
+
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/08/11/矩阵的旋转平移正变换及反变换/" title="矩阵的旋转平移正变换及反变换">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  矩阵的旋转平移正变换及反变换</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/01/20/jacobi求解特征值及特征向量/"  title="Jacobi 解特征值及特征向量">
+ <strong>NEXT:</strong><br/> 
+ <span>Jacobi 解特征值及特征向量
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+<div id="asidepart">
+
+<aside class="clearfix">
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Copyright  © 2015 
+		snail
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>

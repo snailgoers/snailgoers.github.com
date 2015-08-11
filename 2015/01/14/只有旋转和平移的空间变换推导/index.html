@@ -1,0 +1,284 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>只有旋转和平移的变换矩阵推导 | Opengcl</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="snailgoers">
+    
+    <meta name="description" content="此处推导只针对二维情况，三维情况肯定也是合适的，暂时没有推导假设二维平面中有两条曲线，求一组变换矩阵，使得两条曲线的间距最小，自然而然大家第一个想到的就应该是最小二乘法，推导步骤如下所示
+
+但是在求得theta后，因为有正负之分，可能会相差180°，此时，再需比较一下两次变换后的距离，即可求得所需旋">
+    
+    
+    <meta name="keywords" content="算法设计学习分享,图像处理,计算几何,通用计算库">
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Opengcl">Opengcl</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/algorithm">Alogrithm</a></li>
+					
+						<li><a href="/application">App</a></li>
+					
+						<li><a href="/life">Life</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:opengcl.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/01/14/只有旋转和平移的空间变换推导/" title="只有旋转和平移的变换矩阵推导" itemprop="url">只有旋转和平移的变换矩阵推导</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://opengcl.com" title="snailgoers">snailgoers</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2015-01-14T08:02:36.000Z" itemprop="datePublished">Jan 14 2015</time>
+    更新日期:<time datetime="2015-01-30T08:32:55.000Z" itemprop="dateModified">Jan 30 2015</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<p>此处推导只针对二维情况，三维情况肯定也是合适的，暂时没有推导<br>假设二维平面中有两条曲线，求一组变换矩阵，使得两条曲线的间距最小，自然而然大家第一个想到的就应该是最小二乘法，推导步骤如下所示</p>
+<p><img src="http://snailgoers.qiniudn.com/rotateMatrix.jpg" alt=""></p>
+<p>但是在求得theta后，因为有正负之分，可能会相差180°，此时，再需比较一下两次变换后的距离，即可求得所需旋转矩阵及平移量</p>
+<p>###code：</p>
+<pre><code>sx1=sum<span class="params">(p1<span class="params">(:,<span class="number">1</span>)</span>)</span>;sy1=sum<span class="params">(p1<span class="params">(:,<span class="number">2</span>)</span>)</span>;
+sx2=sum<span class="params">(p2<span class="params">(:,<span class="number">1</span>)</span>)</span>;sy2=sum<span class="params">(p2<span class="params">(:,<span class="number">2</span>)</span>)</span>;
+sx1y2=sum<span class="params">(p1<span class="params">(:,<span class="number">1</span>)</span>.*p2<span class="params">(:,<span class="number">2</span>)</span>)</span>;
+sy1x2=sum<span class="params">(p1<span class="params">(:,<span class="number">2</span>)</span>.*p2<span class="params">(:,<span class="number">1</span>)</span>)</span>;
+sy1y2=sum<span class="params">(p1<span class="params">(:,<span class="number">2</span>)</span>.*p2<span class="params">(:,<span class="number">2</span>)</span>)</span>;
+sx1x2=sum<span class="params">(p1<span class="params">(:,<span class="number">1</span>)</span>.*p2<span class="params">(:,<span class="number">1</span>)</span>)</span>;
+theta =<span class="built_in">atan</span><span class="params">(<span class="params">(sx1*sy2-len1*sx1y2-sy1*sx2+len1*sy1x2)</span> /...
+    <span class="params">(sy1*sy2-len1*sy1y2+sx1*sx2-len1*sx1x2)</span>)</span>
+M=[<span class="built_in">cos</span><span class="params">(theta)</span> <span class="built_in">sin</span><span class="params">(theta)</span> <span class="number">0</span>;-<span class="built_in">sin</span><span class="params">(theta)</span> <span class="built_in">cos</span><span class="params">(theta)</span> <span class="number">0</span>; <span class="number">0</span> <span class="number">0</span> <span class="number">0</span>];
+offx=<span class="params">(sx1-cos<span class="params">(theta)</span>*sx2-sin<span class="params">(theta)</span>*sy2)</span>/len1;
+offy=<span class="params">(sy1-cos<span class="params">(theta)</span>*sy2+sin<span class="params">(theta)</span>*sx2)</span>/len1;
+</code></pre>  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/最小二乘法/">最小二乘法</a><a href="/tags/计算几何/">计算几何</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/算法/">算法</a>
+</div>
+
+
+
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/01/14/开轮廓轮廓跟踪/" title="开轮廓轮轮廓跟踪">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  开轮廓轮轮廓跟踪</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2014/12/30/bwlabel之C++/"  title="bwlabel之C++">
+ <strong>NEXT:</strong><br/> 
+ <span>bwlabel之C++
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+<div id="asidepart">
+
+<aside class="clearfix">
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Copyright  © 2015 
+		snail
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>

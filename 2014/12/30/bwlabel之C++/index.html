@@ -1,0 +1,864 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>bwlabel之C++ | Opengcl</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="snailgoers">
+    
+    <meta name="description" content="最近因为需要，会用到二值图像连通域分析算法，网上找了一些算法，但是都存在问题，比较多的一个是利用等价表的方法剔除错误标签方法，但是在后续开发中，验证了这个算法也存在问题，参考这个链接，改为c++的代码，文中作者也提出了相应的改进算法，但是不是很明白，按此建议修改错误标签更正算法，其结果经验证与mat">
+    
+    
+    <meta name="keywords" content="算法设计学习分享,图像处理,计算几何,通用计算库">
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Opengcl">Opengcl</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/algorithm">Alogrithm</a></li>
+					
+						<li><a href="/application">App</a></li>
+					
+						<li><a href="/life">Life</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:opengcl.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/12/30/bwlabel之C++/" title="bwlabel之C++" itemprop="url">bwlabel之C++</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://opengcl.com" title="snailgoers">snailgoers</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2014-12-30T06:30:18.000Z" itemprop="datePublished">Dec 30 2014</time>
+    更新日期:<time datetime="2014-12-30T06:47:13.000Z" itemprop="dateModified">Dec 30 2014</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<p>最近因为需要，会用到二值图像连通域分析算法，网上找了一些算法，但是都存在问题，比较多的一个是利用等价表的方法剔除错误标签方法，但是在后续开发中，验证了这个算法也存在问题，<a href="http://blog.sina.com.cn/s/blog_4513dde60100o6oz.html" target="_blank" rel="external">参考</a>这个链接，改为c++的代码，文中作者也提出了相应的改进算法，但是不是很明白，按此建议修改错误标签更正算法，其结果经验证与matlab bwlabel算法结果一直，算法速度上没有做进一步优化，日后会做进一步优化。</p>
+<p>###原始代码</p>
+<pre><code><span class="comment">/// 连通区域标记</span>
+<span class="function"><span class="keyword">void</span> <span class="title">CalNumberOfRuns</span><span class="params">(<span class="keyword">const</span> uchar *data, <span class="keyword">int</span> height, <span class="keyword">int</span> width, <span class="keyword">int</span> &amp;numRuns)</span>
+</span>{
+    assert(data != <span class="literal">NULL</span>);
+    <span class="keyword">int</span> count = <span class="number">0</span>;
+    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; width; j++)
+    {
+        <span class="keyword">if</span> (data[j] != <span class="number">0</span>)
+        {
+            count++;
+        }
+        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; height; i++)
+        {
+            <span class="keyword">if</span> (data[i * width + j] != <span class="number">0</span> &amp;&amp; data[(i - <span class="number">1</span>) * width + j] == <span class="number">0</span>)
+            {
+                count++;
+            }
+        }
+    }
+    numRuns = count;
+}
+
+<span class="function"><span class="keyword">void</span> <span class="title">FillRunVectors</span><span class="params">(<span class="keyword">const</span> uchar* data, <span class="keyword">int</span> *runs, <span class="keyword">int</span> height, <span class="keyword">int</span> width, <span class="keyword">int</span> *firstRowDex, <span class="keyword">int</span> *lastRowDex, <span class="keyword">int</span> *colDex, <span class="keyword">int</span> numRuns)</span>
+</span>{
+    assert(data != <span class="literal">NULL</span> &amp;&amp; runs != <span class="literal">NULL</span> &amp;&amp; firstRowDex != <span class="literal">NULL</span> &amp;&amp; lastRowDex != <span class="literal">NULL</span> &amp;&amp; colDex != <span class="literal">NULL</span>);
+    <span class="keyword">int</span> k = -<span class="number">1</span>;
+    <span class="built_in">memset</span>(runs, <span class="number">0</span>, <span class="function">height * width * <span class="title">sizeof</span><span class="params">(<span class="keyword">int</span>)</span>)</span>;
+    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; width; j++)
+    {
+        <span class="keyword">if</span> (data[j] != <span class="number">0</span>)
+        {
+            k++;
+            firstRowDex[k] = <span class="number">0</span>;
+            colDex[k] = j;
+            runs[j] = k + <span class="number">1</span>;
+        }
+        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; height; i++)
+        {
+            <span class="keyword">int</span> index = i * width + j;
+            <span class="keyword">int</span> _index = index - width;
+            <span class="keyword">if</span> (data[index] == <span class="number">0</span> &amp;&amp; data[_index] != <span class="number">0</span>)
+            {
+                lastRowDex[k] = i - <span class="number">1</span>;
+            }
+            <span class="keyword">else</span>
+            {
+                <span class="keyword">if</span> (data[index] != <span class="number">0</span>)
+                {
+                    <span class="keyword">if</span> (data[_index] == <span class="number">0</span>)
+                    {
+                        k++;
+                        firstRowDex[k] = i;
+                        colDex[k] = j;
+                    }
+                    runs[index] = k + <span class="number">1</span>;
+
+                    <span class="keyword">if</span> (i == height - <span class="number">1</span>)
+                    {
+                        lastRowDex[k] = i;
+                    }
+                }
+            }
+        }
+    }
+    assert(k == numRuns - <span class="number">1</span>);
+}
+<span class="comment">/// 标记二值连通区域，返回连通区域个数</span>
+<span class="function"><span class="keyword">bool</span> <span class="title">Mor_Bwlabel</span><span class="params">(uchar *data, <span class="keyword">int</span> *label, <span class="keyword">int</span> height, <span class="keyword">int</span> width, <span class="keyword">int</span> minarea, <span class="keyword">int</span> mode, <span class="keyword">int</span> &amp;numRegions)</span>
+</span>{
+    assert(data != <span class="literal">NULL</span> &amp;&amp; label != <span class="literal">NULL</span>);
+    <span class="keyword">int</span> totalPixels = height * width;
+    <span class="comment">// calculate the number of runs in data</span>
+    <span class="keyword">int</span> numRuns = <span class="number">0</span>;
+    CalNumberOfRuns(data, height, width, numRuns);
+    <span class="comment">// calculate run vectors, including firstRowDex, lastRowDex, colDex of each run</span>
+    <span class="keyword">int</span> *firstRowDex = <span class="keyword">new</span> <span class="keyword">int</span> [numRuns];
+    <span class="keyword">int</span> *lastRowDex = <span class="keyword">new</span> <span class="keyword">int</span> [numRuns];
+    <span class="keyword">int</span> *colDex = <span class="keyword">new</span> <span class="keyword">int</span> [numRuns];
+    <span class="keyword">int</span> *runs = <span class="keyword">new</span> <span class="keyword">int</span>[totalPixels];
+    FillRunVectors(data, runs, height, width, firstRowDex, lastRowDex, colDex, numRuns);
+
+    <span class="comment">// Initiate runLabels (the label of each run)</span>
+    <span class="keyword">int</span> *runLabels = <span class="keyword">new</span> <span class="keyword">int</span>[numRuns];
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; numRuns; i++)
+    {
+        runLabels[i] = <span class="number">0</span>;
+    }
+
+    <span class="comment">// 初始化等价集合表</span>
+    <span class="keyword">int</span> *equalSet = <span class="keyword">new</span> <span class="keyword">int</span>[MaxConnectRegions];
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; MaxConnectRegions; i++)
+    {
+        equalSet[i] = i;
+    }
+
+    <span class="comment">// Initiate params</span>
+    <span class="keyword">int</span> currentColumn = -<span class="number">1</span>;
+    <span class="keyword">int</span> nextLabel = <span class="number">1</span>;
+    <span class="keyword">int</span> firstRunOnPreviousColumn = -<span class="number">1</span>;
+    <span class="keyword">int</span> lastRunOnPreviousColumn = -<span class="number">1</span>;
+    <span class="keyword">int</span> firstRunOnThisColumn = -<span class="number">1</span>;
+    <span class="keyword">int</span> offset = <span class="number">0</span>;
+    <span class="keyword">if</span> (mode == <span class="number">8</span>)
+    {
+        offset = <span class="number">1</span>;
+    }
+
+    <span class="keyword">for</span> (<span class="keyword">int</span> k = <span class="number">0</span>; k &lt; numRuns; k++)
+    {
+        <span class="keyword">if</span> (colDex[k] == currentColumn + <span class="number">1</span>)
+        {
+            firstRunOnPreviousColumn = firstRunOnThisColumn;
+            firstRunOnThisColumn = k;
+            lastRunOnPreviousColumn = k-<span class="number">1</span>;
+            currentColumn = colDex[k];
+        }
+        <span class="keyword">else</span> <span class="keyword">if</span> (colDex[k] &gt; currentColumn + <span class="number">1</span>)
+        {
+            firstRunOnPreviousColumn = -<span class="number">1</span>;
+            firstRunOnThisColumn = k;
+            lastRunOnPreviousColumn = -<span class="number">1</span>;
+            currentColumn = colDex[k];
+        }
+
+        <span class="keyword">if</span> (firstRunOnPreviousColumn &gt;= <span class="number">0</span>)
+        {
+            <span class="keyword">int</span> p = firstRunOnPreviousColumn;
+            <span class="keyword">while</span> (p &lt;= lastRunOnPreviousColumn &amp;&amp; lastRowDex[k] &gt;= firstRowDex[p] - offset)
+            {
+                <span class="keyword">if</span> (firstRowDex[k] &lt;= lastRowDex[p] + offset)
+                {
+                    <span class="keyword">if</span> (runLabels[k] == <span class="number">0</span>)
+                    {
+                        runLabels[k] = runLabels[p];
+                    }
+                    <span class="keyword">else</span> <span class="keyword">if</span> (runLabels[k] != runLabels[p])
+                    {
+                        <span class="keyword">if</span> (equalSet[runLabels[k]] &lt; equalSet[runLabels[p]])
+                        {
+                            equalSet[runLabels[p]] = equalSet[runLabels[k]];
+                        }
+                        <span class="keyword">else</span>
+                        {
+                            equalSet[runLabels[k]] = equalSet[runLabels[p]];
+                        }
+                    }
+                }
+                p++;
+            }
+        }
+
+        <span class="keyword">if</span> (runLabels[k] == <span class="number">0</span>)
+        {
+            runLabels[k] = nextLabel;
+            nextLabel++;
+            <span class="keyword">if</span> (nextLabel &gt; MaxConnectRegions)
+            {
+                <span class="keyword">return</span> <span class="literal">false</span>;
+            }
+        }
+    }
+
+
+    <span class="comment">//标记替换</span>
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; nextLabel; i++)
+    {
+        equalSet[i] = equalSet[equalSet[i]];
+    }
+
+
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; numRuns; i++)
+    {
+        runLabels[i] = equalSet[runLabels[i]];
+    }
+
+
+    <span class="comment">// 标记连通区域标号</span>
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; totalPixels; i++)
+    {
+        <span class="keyword">if</span> (runs[i] != <span class="number">0</span>)
+        {
+            label[i] = runLabels[runs[i]-<span class="number">1</span>];
+        }
+        <span class="keyword">else</span>
+        {
+            label[i] = <span class="number">0</span>;
+        }
+    }
+
+    <span class="keyword">int</span> *area = <span class="keyword">new</span> <span class="keyword">int</span>[nextLabel];
+    <span class="built_in">memset</span>(area, <span class="number">0</span>, <span class="keyword">sizeof</span>(<span class="keyword">int</span>) * nextLabel);
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; totalPixels; i++)
+    {
+        area[label[i]]++;
+    }
+    numRegions = <span class="number">0</span>;
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; nextLabel; i++)
+    {
+        <span class="keyword">if</span> (area[i] &lt; minarea)
+        {
+            equalSet[i] = <span class="number">0</span>;
+        }
+        <span class="keyword">else</span>
+        {        
+            numRegions++;
+            equalSet[i] = numRegions;
+        }
+    }
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; totalPixels; i++)
+    {
+        label[i] = equalSet[label[i]];
+    }
+
+    <span class="keyword">delete</span>[] firstRowDex;
+    <span class="keyword">delete</span>[] lastRowDex;
+    <span class="keyword">delete</span>[] colDex;
+    <span class="keyword">delete</span>[] runs;
+    <span class="keyword">delete</span>[] runLabels;
+    <span class="keyword">delete</span>[] equalSet;
+    <span class="keyword">return</span> <span class="literal">true</span>;
+}
+</code></pre><p>###改进后代码</p>
+<pre><code><span class="comment">// 依据图连通域分量合并错分的runs，并重新赋值，返回实际的连通域个数</span>
+<span class="function"><span class="keyword">int</span> <span class="title">RunlabelDeleteError</span><span class="params">(<span class="keyword">int</span> *runlabel, <span class="keyword">int</span> *outlabel, <span class="keyword">int</span> numRuns, <span class="built_in">vector</span>&lt;<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; &gt; sameLabel)</span>
+</span>{
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; sameLabel.size(); i++)
+    {
+
+        <span class="keyword">if</span> (sameLabel[i].size() &lt; <span class="number">2</span>)
+        {
+            <span class="keyword">continue</span>;
+        }
+        <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; sameLabel[i].size(); j++)
+        {
+            <span class="keyword">for</span> (<span class="keyword">int</span> k = <span class="number">0</span>; k &lt; numRuns; k++)
+            {
+                <span class="keyword">if</span> (runlabel[k] == sameLabel[i][j])
+                {
+                    runlabel[k] = sameLabel[i][<span class="number">0</span>];
+                }
+            }
+        }
+    }
+    <span class="comment">// label 去重，排序</span>
+    <span class="built_in">vector</span>&lt;<span class="keyword">int</span> &gt; temp;
+    temp.push_back(runlabel[<span class="number">0</span>]);
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; numRuns; i++)
+    {
+        <span class="keyword">bool</span> flag = <span class="literal">false</span>;
+        <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; temp.size(); j++)
+        {
+            flag |= runlabel[i] == temp[j];
+        }
+        <span class="keyword">if</span> (!flag)
+        {
+            temp.push_back(runlabel[i]);
+        }
+    }
+    <span class="keyword">int</span> *data = <span class="keyword">new</span> <span class="keyword">int</span>[temp.size()];
+    <span class="keyword">int</span> *index = <span class="keyword">new</span> <span class="keyword">int</span>[temp.size()];
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; temp.size(); i++)
+    {
+        data[i] = temp[i];
+        index[i] = i;
+    }
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; temp.size() - <span class="number">1</span>; i++)
+    {
+        <span class="keyword">for</span> (<span class="keyword">int</span> j = i + <span class="number">1</span>; j &lt; temp.size(); j++)
+        {
+            <span class="keyword">if</span> (data[i] &gt; data[j])
+            {
+                <span class="keyword">int</span> temp =data[i];
+                data[i] = data[j];
+                data[j] = temp;
+                temp = index[i];
+                index[i] = index[j];
+                index[j] = temp;
+            }
+        }
+    }
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; numRuns; i++)
+    {
+        <span class="keyword">int</span> index = <span class="number">0</span>; 
+        <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; temp.size(); j++)
+        {
+            <span class="keyword">if</span> (runlabel[i] == data[j])
+            {
+                index = j;
+                <span class="keyword">break</span>;
+            }
+        }
+        outlabel[i] = index + <span class="number">1</span>;
+    }
+
+    <span class="keyword">delete</span>[] data;
+    <span class="keyword">delete</span>[] index;
+
+    <span class="keyword">return</span> temp.size();
+}
+
+
+<span class="function"><span class="keyword">void</span> <span class="title">CalNumberOfRuns</span><span class="params">(<span class="keyword">const</span> uchar *data, <span class="keyword">int</span> height, <span class="keyword">int</span> width, <span class="keyword">int</span> &amp;numRuns)</span>
+</span>{
+    assert(data != <span class="literal">NULL</span>);
+    <span class="keyword">int</span> count = <span class="number">0</span>;
+    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; width; j++)
+    {
+        <span class="keyword">if</span> (data[j] != <span class="number">0</span>)
+        {
+            count++;
+        }
+        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; height; i++)
+        {
+            <span class="keyword">if</span> (data[i * width + j] != <span class="number">0</span> &amp;&amp; data[(i - <span class="number">1</span>) * width + j] == <span class="number">0</span>)
+            {
+                count++;
+            }
+        }
+    }
+    numRuns = count;
+}
+<span class="comment">// 记录每一个runs的开始行、结束行和runs所在的列</span>
+<span class="function"><span class="keyword">void</span> <span class="title">FillRunVectors</span><span class="params">(<span class="keyword">const</span> uchar* data, <span class="keyword">int</span> height, <span class="keyword">int</span> width, <span class="keyword">int</span> *firstRowDex, <span class="keyword">int</span> *lastRowDex, <span class="keyword">int</span> *colDex, <span class="keyword">int</span> numRuns)</span>
+</span>{
+    assert(data != <span class="literal">NULL</span>  &amp;&amp; firstRowDex != <span class="literal">NULL</span> &amp;&amp; lastRowDex != <span class="literal">NULL</span> &amp;&amp; colDex != <span class="literal">NULL</span>);
+    <span class="keyword">int</span> k = -<span class="number">1</span>;
+    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; width; j++)
+    {
+        <span class="keyword">if</span> (data[j] != <span class="number">0</span>)
+        {
+            k++;
+            firstRowDex[k] = <span class="number">0</span>;
+            colDex[k] = j;
+        }
+        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; height; i++)
+        {
+            <span class="keyword">int</span> index = i * width + j;
+            <span class="keyword">int</span> _index = index - width;
+            <span class="keyword">if</span> (data[index] == <span class="number">0</span> &amp;&amp; data[_index] != <span class="number">0</span>)
+            {
+                lastRowDex[k] = i - <span class="number">1</span>;
+            }
+            <span class="keyword">else</span>
+            {
+                <span class="keyword">if</span> (data[index] != <span class="number">0</span>)
+                {
+                    <span class="keyword">if</span> (data[_index] == <span class="number">0</span>)
+                    {
+                        k++;
+                        firstRowDex[k] = i;
+                        colDex[k] = j;
+                    }
+
+                    <span class="keyword">if</span> (i == height - <span class="number">1</span>)
+                    {
+                        lastRowDex[k] = i;
+                    }
+                }
+            }
+        }
+    }
+    assert(k == numRuns - <span class="number">1</span>);
+}
+<span class="comment">/// 标记二值连通区域，返回连通区域个数</span>
+<span class="function"><span class="keyword">bool</span> <span class="title">Mor_Bwlabel</span><span class="params">(<span class="keyword">const</span> uchar *data, <span class="keyword">int</span> *label, <span class="keyword">int</span> height, <span class="keyword">int</span> width, <span class="keyword">int</span> mode, <span class="keyword">int</span> &amp;numRegions)</span>
+</span>{
+    assert(data != <span class="literal">NULL</span> &amp;&amp; label != <span class="literal">NULL</span>);
+    <span class="keyword">int</span> totalPixels = height * width;
+    <span class="comment">// calculate the number of runs in data</span>
+    <span class="keyword">int</span> numRuns = <span class="number">0</span>;
+    CalNumberOfRuns(data, height, width, numRuns);
+    <span class="comment">// calculate run vectors, including firstRowDex, lastRowDex, colDex of each run</span>
+    <span class="keyword">int</span> *firstRowDex = <span class="keyword">new</span> <span class="keyword">int</span> [numRuns];
+    <span class="keyword">int</span> *lastRowDex = <span class="keyword">new</span> <span class="keyword">int</span> [numRuns];
+    <span class="keyword">int</span> *colDex = <span class="keyword">new</span> <span class="keyword">int</span> [numRuns];
+    FillRunVectors(data, height, width, firstRowDex, lastRowDex, colDex, numRuns);
+
+    <span class="comment">// Initiate runLabels (the label of each run)</span>
+    <span class="keyword">int</span> *runLabels = <span class="keyword">new</span> <span class="keyword">int</span>[numRuns];
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; numRuns; i++)
+    {
+        runLabels[i] = <span class="number">0</span>;
+    }
+
+    <span class="comment">// Initiate params</span>
+    <span class="keyword">int</span> currentColumn = -<span class="number">1</span>;
+    <span class="keyword">int</span> nextLabel = <span class="number">1</span>;
+    <span class="keyword">int</span> firstRunOnPreviousColumn = -<span class="number">1</span>;
+    <span class="keyword">int</span> lastRunOnPreviousColumn = -<span class="number">1</span>;
+    <span class="keyword">int</span> firstRunOnThisColumn = -<span class="number">1</span>;
+    <span class="keyword">int</span> offset = <span class="number">0</span>;
+    <span class="keyword">if</span> (mode == <span class="number">8</span>)
+    {
+        offset = <span class="number">1</span>;
+    }
+
+    <span class="comment">//////////////////////////////////////////////////////////////////////////</span>
+    <span class="comment">// 利用图深度优先搜索合并错误标签</span>
+    <span class="built_in">vector</span>&lt;edge&gt; sameLabel;
+    <span class="keyword">int</span> p;
+
+    <span class="keyword">for</span> (<span class="keyword">int</span> k = <span class="number">0</span>; k &lt; numRuns; k++)
+    {
+        <span class="keyword">if</span> (colDex[k] == currentColumn + <span class="number">1</span>)
+        {
+            <span class="comment">// 第k个runs跟第k-1个runs在相邻列上</span>
+            firstRunOnPreviousColumn = firstRunOnThisColumn;
+            firstRunOnThisColumn = k;
+            lastRunOnPreviousColumn = k-<span class="number">1</span>;
+            currentColumn = colDex[k];
+        }
+        <span class="keyword">else</span> <span class="keyword">if</span> (colDex[k] &gt; currentColumn + <span class="number">1</span>)
+        {
+            firstRunOnPreviousColumn = -<span class="number">1</span>;
+            firstRunOnThisColumn = k;
+            lastRunOnPreviousColumn = -<span class="number">1</span>;
+            currentColumn = colDex[k];
+        }
+
+        <span class="keyword">if</span> (firstRunOnPreviousColumn &gt;= <span class="number">0</span>)
+        {
+            p = firstRunOnPreviousColumn;
+            <span class="keyword">while</span> (p &lt;= lastRunOnPreviousColumn &amp;&amp; lastRowDex[k] &gt;= firstRowDex[p] - offset)
+            {
+                <span class="keyword">if</span> (firstRowDex[k] &lt;= lastRowDex[p] + offset)
+                {
+                    <span class="keyword">if</span> (runLabels[k] == <span class="number">0</span>)
+                    {
+                        runLabels[k] = runLabels[p];
+                    }
+                    <span class="keyword">else</span> <span class="keyword">if</span> (runLabels[k] != runLabels[p])
+                    {
+                        edge etemp;
+                        etemp.start = runLabels[k];
+                        etemp.end = runLabels[p];
+                        sameLabel.push_back(etemp);
+                    }
+                }
+                p++;
+            }
+        }
+
+        <span class="keyword">if</span> (runLabels[k] == <span class="number">0</span>)
+        {
+            runLabels[k] = nextLabel;
+            nextLabel++;
+        }
+    }
+
+    <span class="built_in">vector</span>&lt;<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; &gt; tempLabel;
+    DfnComponent(sameLabel, tempLabel);  
+
+    <span class="keyword">int</span> *newlabel = <span class="keyword">new</span> <span class="keyword">int</span>[numRuns];
+    numRegions = RunlabelDeleteError(runLabels, newlabel, numRuns, tempLabel);
+
+    <span class="comment">// 赋值label</span>
+    <span class="built_in">memset</span>(label, <span class="number">0</span>, <span class="keyword">sizeof</span>(<span class="keyword">int</span>) * width * height);
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; numRuns; i++)
+    {
+        <span class="keyword">for</span> (<span class="keyword">int</span> k = firstRowDex[i]; k &lt;= lastRowDex[i]; k++)
+        {
+            label[k * width + colDex[i]] = newlabel[i];
+        }
+    }
+
+    <span class="keyword">delete</span>[] newlabel;
+    <span class="keyword">delete</span>[] firstRowDex;
+    <span class="keyword">delete</span>[] lastRowDex;
+    <span class="keyword">delete</span>[] colDex;
+    <span class="keyword">delete</span>[] runLabels;
+    <span class="keyword">return</span> <span class="literal">true</span>;
+}
+</code></pre><h3 id="图结构：邻接链表表示">图结构：邻接链表表示</h3><pre><code><span class="comment">/// 图算法相关</span>
+<span class="keyword">typedef</span> <span class="keyword">struct</span> EDGE{
+    <span class="keyword">int</span> start, end;
+    EDGE()
+    {
+        start = <span class="number">0</span>;
+        end = <span class="number">0</span>;
+    }
+    EDGE(<span class="keyword">int</span> a, <span class="keyword">int</span> b)
+    {
+        start = a;
+        end = b;
+    }
+}edge;
+<span class="keyword">typedef</span> <span class="keyword">struct</span> GraphicNode{
+    <span class="keyword">int</span> vertex; <span class="comment">//顶点数据信息</span>
+    GraphicNode *nextNode;
+}graphNode;
+</code></pre><h3 id="图深度优先搜索及图连通域分量分析">图深度优先搜索及图连通域分量分析</h3><pre><code><span class="preprocessor">#<span class="keyword">include</span> <span class="string">"DataStruct.h"</span></span>
+<span class="preprocessor">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span>
+
+<span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;
+
+<span class="function"><span class="keyword">void</span> <span class="title">CreateGpaphic</span><span class="params">(<span class="built_in">vector</span>&lt;edge&gt; pt, GraphicNode *G)</span>
+</span>{
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; pt.size(); i++)
+    {
+        <span class="keyword">int</span> start = pt[i].start;
+        <span class="keyword">int</span> end = pt[i].end;
+        <span class="comment">// create a new node</span>
+        GraphicNode *node, *ptr;
+        node = <span class="keyword">new</span> GraphicNode();
+        node-&gt;vertex = end;
+        node-&gt;nextNode = <span class="literal">NULL</span>;
+
+        ptr = &amp;(G[start]);
+        <span class="keyword">while</span> (ptr-&gt;nextNode != <span class="literal">NULL</span>)
+        {
+            ptr = ptr-&gt;nextNode;
+        }
+        ptr-&gt;nextNode = node;
+    }
+}
+
+<span class="comment">// 图深度优先搜索算法</span>
+<span class="function"><span class="keyword">void</span> <span class="title">dfn</span><span class="params">(GraphicNode *G, <span class="keyword">bool</span> *visited, <span class="keyword">int</span> current, <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; &amp;index)</span>
+</span>{
+    <span class="comment">//printf("vertex = %d\n", current);</span>
+    index.push_back(current);
+    visited[current] = <span class="literal">true</span>;
+    GraphicNode *p = &amp;G[current];
+    <span class="keyword">while</span> (p != <span class="literal">NULL</span>)
+    {
+        <span class="keyword">if</span> (!visited[p-&gt;vertex])
+        {
+            dfn(G, visited, p-&gt;vertex, index);
+        }
+        p = p-&gt;nextNode;
+    }
+}
+
+<span class="comment">// 图连通域分量</span>
+<span class="function"><span class="keyword">void</span> <span class="title">DfnComponent</span><span class="params">(<span class="built_in">vector</span>&lt;edge&gt; pt, <span class="built_in">vector</span>&lt;<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; &gt; &amp;outdata)</span>
+</span>{
+    <span class="comment">// 统计节点个数, 以空间消耗替代时间消耗</span>
+    <span class="keyword">int</span> nodeNum = max(pt[<span class="number">0</span>].start, pt[<span class="number">0</span>].end);
+    <span class="keyword">int</span> startIndex = min(pt[<span class="number">0</span>].start, pt[<span class="number">0</span>].end);
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; pt.size(); i++)
+    {
+        <span class="keyword">if</span> (pt[i].start &gt; nodeNum)
+        {
+            nodeNum = pt[i].start;
+        }
+        <span class="keyword">if</span> (pt[i].end &gt; nodeNum)
+        {
+            nodeNum = pt[i].end;
+        }
+        <span class="keyword">if</span> (pt[i].start &lt; startIndex)
+        {
+            startIndex = pt[i].start;
+        }
+        <span class="keyword">if</span> (pt[i].end &lt; startIndex)
+        {
+            startIndex = pt[i].end;
+        }
+    }
+
+    <span class="comment">// 构造无向图</span>
+    <span class="built_in">vector</span>&lt;edge&gt; pt2; <span class="comment">// 无向图应该为双向的，输入pt为单向的，复制反向</span>
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; pt.size(); i++)
+    {
+        <span class="function">edge <span class="title">ptemp</span><span class="params">(pt[i].end, pt[i].start)</span></span>;
+        pt2.push_back(pt[i]);
+        pt2.push_back(ptemp);
+    }
+    nodeNum = nodeNum + <span class="number">1</span>; <span class="comment">// 开始索引为0</span>
+
+    GraphicNode *G = <span class="keyword">new</span> GraphicNode[nodeNum];
+    <span class="keyword">bool</span> *visited = <span class="keyword">new</span> <span class="keyword">bool</span>[nodeNum];
+    <span class="built_in">memset</span>(visited, <span class="number">0</span>, nodeNum);
+    <span class="comment">// initial the G</span>
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; nodeNum; i++)
+    {
+        G[i].vertex = i;
+        G[i].nextNode = <span class="literal">NULL</span>;
+    }
+    CreateGpaphic(pt2, G);
+    <span class="keyword">int</span> count = <span class="number">0</span>;
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = startIndex; i &lt; nodeNum; i++)
+    {
+        <span class="keyword">if</span> (!visited[i] &amp;&amp; G[i].nextNode != <span class="literal">NULL</span>)
+        {   
+            <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; index;
+            dfn(G, visited, i, index);
+            count++;
+            outdata.push_back(index);
+        }
+    }
+
+
+    <span class="keyword">delete</span>[] G;
+    <span class="keyword">delete</span>[] visited;
+}
+</code></pre>  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/图/">图</a><a href="/tags/图连通域分量/">图连通域分量</a><a href="/tags/深度优先搜索/">深度优先搜索</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/算法/">算法</a>
+</div>
+
+
+
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/01/14/只有旋转和平移的空间变换推导/" title="只有旋转和平移的变换矩阵推导">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  只有旋转和平移的变换矩阵推导</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2014/12/25/svn file locked error/"  title="svn file was locked ,can not commit">
+ <strong>NEXT:</strong><br/> 
+ <span>svn file was locked ,can not commit
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+<div id="asidepart">
+
+<aside class="clearfix">
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Copyright  © 2015 
+		snail
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>

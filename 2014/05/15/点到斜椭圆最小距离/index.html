@@ -1,0 +1,415 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>任意点到斜椭圆最小距离 | Opengcl</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="snailgoers">
+    
+    <meta name="description" content="最近由于项目需求，要计算任意点到斜椭圆的距离，方程相信大家都知道怎么建立，但是它是一个4次方程，matlab都很不好解，写到程序中也很难，搜了很多帖子，都是只给方程，不给解的，其实原理大家都知道，如何用程序解才是大家关心的，所以一直都没有找到合理的答案，关键时刻还是google给力，度娘一般的东西还">
+    
+    
+    <meta name="keywords" content="算法设计学习分享,图像处理,计算几何,通用计算库">
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Opengcl">Opengcl</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/algorithm">Alogrithm</a></li>
+					
+						<li><a href="/application">App</a></li>
+					
+						<li><a href="/life">Life</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:opengcl.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/05/15/点到斜椭圆最小距离/" title="任意点到斜椭圆最小距离" itemprop="url">任意点到斜椭圆最小距离</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://opengcl.com" title="snailgoers">snailgoers</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2014-05-15T07:24:10.000Z" itemprop="datePublished">May 15 2014</time>
+    更新日期:<time datetime="2014-09-01T01:46:57.000Z" itemprop="dateModified">Sep 1 2014</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<p>最近由于项目需求，要计算任意点到斜椭圆的距离，方程相信大家都知道怎么建立，但是它是一个4次方程，matlab都很不好解，写到程序中也很难，搜了很多帖子，都是只给方程，不给解的，其实原理大家都知道，如何用程序解才是大家关心的，所以一直都没有找到合理的答案，关键时刻还是google给力，度娘一般的东西还撮合，可学术性的、英文的确是一塌糊涂，网络上收集到这样一篇<a href="http://www.geometrictools.com/Documentation/DistancePointEllipseEllipsoid.pdf" target="_blank" rel="external">论文</a>,我也是用这个算法最终解决我的问题的，它只使用与标准方程，斜椭圆只是多了平移和旋转操作而已。</p>
+<p>###第一象限中的点到标准椭圆的距离###</p>
+<pre><code><span class="function"><span class="keyword">double</span> <span class="title">DistancePointEllipseSpecial</span><span class="params">(<span class="keyword">const</span> <span class="keyword">double</span> e[<span class="number">2</span>], <span class="keyword">const</span> <span class="keyword">double</span> y[<span class="number">2</span>], <span class="keyword">double</span> x[<span class="number">2</span>])</span>
+</span>{
+    <span class="keyword">double</span> distance;
+    <span class="keyword">if</span> (y[<span class="number">1</span>] &gt; <span class="number">0</span>)
+    {
+        <span class="keyword">if</span> (y[<span class="number">0</span>] &gt; <span class="number">0</span>)
+        {
+            <span class="comment">// bisect to compute the root of F(t) for t &gt;= -e1*d1</span>
+            <span class="keyword">double</span> esqr[<span class="number">2</span>] = {e[<span class="number">0</span>] * e[<span class="number">0</span>], e[<span class="number">1</span>] * e[<span class="number">1</span>]};
+            <span class="keyword">double</span> ey[<span class="number">2</span>] = {e[<span class="number">0</span>] * y[<span class="number">0</span>], e[<span class="number">1</span>] * y[<span class="number">1</span>]};
+            <span class="keyword">double</span> t0 = -esqr[<span class="number">1</span>] + ey[<span class="number">1</span>];
+            <span class="keyword">double</span> t1 = -esqr[<span class="number">1</span>] + sqrtf(ey[<span class="number">0</span>]*ey[<span class="number">0</span>] + ey[<span class="number">1</span>]*ey[<span class="number">1</span>]);
+            <span class="keyword">double</span> t = t0;
+            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; ; ++i)
+            {
+                t = <span class="number">0.5</span>*(t0 + t1);
+                <span class="keyword">if</span> (t == t0 || t == t1)
+                {
+                    <span class="keyword">break</span>;
+                }
+                <span class="keyword">double</span> r[<span class="number">2</span>] = { ey[<span class="number">0</span>]/(t + esqr[<span class="number">0</span>]), ey[<span class="number">1</span>]/(t + esqr[<span class="number">1</span>]) };
+                <span class="keyword">double</span> f = r[<span class="number">0</span>]*r[<span class="number">0</span>] + r[<span class="number">1</span>]*r[<span class="number">1</span>] - <span class="number">1</span>;
+                <span class="keyword">if</span> (f &gt; <span class="number">0</span>)
+                {
+                    t0 = t;
+                }
+                <span class="keyword">else</span> <span class="keyword">if</span> (f &lt; <span class="number">0</span>)
+                {
+                    t1 = t;
+                }
+                <span class="keyword">else</span>
+                {
+                    <span class="keyword">break</span>;
+                }
+            }
+            x[<span class="number">0</span>] = esqr[<span class="number">0</span>]*y[<span class="number">0</span>]/(t + esqr[<span class="number">0</span>]);
+            x[<span class="number">1</span>] = esqr[<span class="number">1</span>]*y[<span class="number">1</span>]/(t + esqr[<span class="number">1</span>]);
+            <span class="keyword">double</span> d[<span class="number">2</span>] = { x[<span class="number">0</span>] - y[<span class="number">0</span>], x[<span class="number">1</span>] - y[<span class="number">1</span>] };
+            distance = sqrtf(d[<span class="number">0</span>]*d[<span class="number">0</span>] + d[<span class="number">1</span>]*d[<span class="number">1</span>]);
+        }
+        <span class="keyword">else</span> <span class="comment">// y0 == 0</span>
+        {
+            x[<span class="number">0</span>] = <span class="number">0</span>;
+            x[<span class="number">1</span>] = e[<span class="number">1</span>];
+            distance = <span class="built_in">fabs</span>(y[<span class="number">1</span>] - e[<span class="number">1</span>]);
+        }
+    }
+    <span class="keyword">else</span> <span class="comment">// y1 == 0</span>
+    {
+        <span class="keyword">double</span> denom0 = e[<span class="number">0</span>]*e[<span class="number">0</span>] - e[<span class="number">1</span>]*e[<span class="number">1</span>];
+        <span class="keyword">double</span> e0y0 = e[<span class="number">0</span>]*y[<span class="number">0</span>];
+        <span class="keyword">if</span> (e0y0 &lt; denom0)
+        {
+            <span class="comment">// y0 is inside the subinterval.</span>
+            <span class="keyword">double</span> x0de0 = e0y0/denom0;
+            <span class="keyword">double</span> x0de0sqr = x0de0*x0de0;
+            x[<span class="number">0</span>] = e[<span class="number">0</span>]*x0de0;
+            x[<span class="number">1</span>] = e[<span class="number">1</span>]*sqrtf(<span class="built_in">fabs</span>(<span class="number">1</span> - x0de0sqr));
+            <span class="keyword">double</span> d0 = x[<span class="number">0</span>] - y[<span class="number">0</span>];
+            distance = sqrtf(d0*d0 + x[<span class="number">1</span>]*x[<span class="number">1</span>]);
+        }
+        <span class="keyword">else</span>
+        {
+            <span class="comment">// y0 is outside the subinterval. The closest ellipse point has</span>
+            <span class="comment">// x1 == 0 and is on the domain-boundary interval (x0/e0)^2 = 1.</span>
+            x[<span class="number">0</span>] = e[<span class="number">0</span>];
+            x[<span class="number">1</span>] = <span class="number">0</span>;
+            distance = <span class="built_in">fabs</span>(y[<span class="number">0</span>] - e[<span class="number">0</span>]);
+        }
+    }
+    <span class="keyword">return</span> distance;
+}
+</code></pre><h3 id="任意象限的点到标准椭圆的距离">任意象限的点到标准椭圆的距离</h3><pre><code><span class="function"><span class="keyword">double</span> <span class="title">DistancePointEllipse</span> <span class="params">(<span class="keyword">const</span> <span class="keyword">double</span> e[<span class="number">2</span>], <span class="keyword">const</span> <span class="keyword">double</span> y[<span class="number">2</span>], <span class="keyword">double</span> x[<span class="number">2</span>])</span>
+</span>{
+    <span class="comment">// Determine reflections for y to the first quadrant.</span>
+    <span class="keyword">bool</span> reflect[<span class="number">2</span>];
+    <span class="keyword">int</span> i, j;
+    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="number">2</span>; ++i)
+    {
+        reflect[i] = y[i] &lt; <span class="number">0</span>;
+    }
+    <span class="comment">// Determine the axis order for decreasing extents.</span>
+    <span class="keyword">int</span> permute[<span class="number">2</span>];
+    <span class="keyword">if</span> (e[<span class="number">0</span>] &lt; e[<span class="number">1</span>])
+    {
+        permute[<span class="number">0</span>] = <span class="number">1</span>; permute[<span class="number">1</span>] = <span class="number">0</span>;
+    }
+    <span class="keyword">else</span>
+    {
+        permute[<span class="number">0</span>] = <span class="number">0</span>; permute[<span class="number">1</span>] = <span class="number">1</span>;
+    }
+    <span class="keyword">int</span> invpermute[<span class="number">2</span>];
+    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="number">2</span>; ++i)
+    {
+        invpermute[permute[i]] = i;
+    }
+    <span class="keyword">double</span> locE[<span class="number">2</span>], locY[<span class="number">2</span>];
+    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="number">2</span>; ++i)
+    {
+        j = permute[i];
+        locE[i] = e[j];
+        locY[i] = y[j];
+        <span class="keyword">if</span> (reflect[j])
+        {
+            locY[i] = -locY[i];
+        }
+    }
+    <span class="keyword">double</span> locX[<span class="number">2</span>];
+    <span class="keyword">double</span> distance = DistancePointEllipseSpecial(locE, locY, locX);
+    <span class="comment">// Restore the axis order and reflections.</span>
+    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="number">2</span>; ++i)
+    {
+        j = invpermute[i];
+        <span class="keyword">if</span> (reflect[i])
+        {
+            locX[j] = -locX[j];
+        }
+        x[i] = locX[j];
+    }
+    <span class="keyword">return</span> distance;
+}
+</code></pre><h3 id="任意点到斜椭圆的距离">任意点到斜椭圆的距离</h3><pre><code><span class="keyword">double</span> dist_point_ellipse( <span class="keyword">const</span> POINT &amp;point1, <span class="keyword">const</span> ELLIPSE &amp;<span class="built_in">ellipse</span> )
+{
+    <span class="keyword">double</span> distance;
+    <span class="keyword">double</span> yin[<span class="number">2</span>], xout[<span class="number">2</span>];
+    <span class="keyword">double</span> ein[<span class="number">2</span>] = {<span class="built_in">ellipse</span>.a, <span class="built_in">ellipse</span>.b};
+    <span class="keyword">double</span> cost = <span class="built_in">cos</span>(<span class="built_in">ellipse</span>.theta * _PI / <span class="number">180</span>);
+    <span class="keyword">double</span> sint = <span class="built_in">sin</span>(<span class="built_in">ellipse</span>.theta * _PI / <span class="number">180</span>);
+
+    POINT <span class="built_in">point</span> = point1;
+    <span class="built_in">point</span> = <span class="built_in">point</span> - <span class="built_in">ellipse</span>.center;
+    yin[<span class="number">0</span>] = cost * <span class="built_in">point</span>.x + sint * <span class="built_in">point</span>.y;
+    yin[<span class="number">1</span>] = -sint * <span class="built_in">point</span>.x + cost * <span class="built_in">point</span>.y;
+
+    distance = DistancePointEllipse(ein, yin, xout);
+
+    POINT pt;
+    pt.x = cost * xout[<span class="number">0</span>] - sint * xout[<span class="number">1</span>];
+    pt.y = sint * xout[<span class="number">0</span>] + cost * xout[<span class="number">1</span>];
+    pt = pt + <span class="built_in">ellipse</span>.center;
+
+    distance = sqrtf((pt.x - point1.x) * (pt.x - point1.x) + (pt.y - point1.y) * (pt.y - point1.y));
+
+    <span class="keyword">return</span> distance;
+}
+</code></pre><h3 id="效果展示">效果展示</h3><p><img src="http://ww1.sinaimg.cn/large/005zHPWgjw1egf008za68j31400lrjt8.jpg" alt="点到椭圆最小距离"></p>
+  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/算法/">算法</a><a href="/tags/计算几何/">计算几何</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/算法/">算法</a>
+</div>
+
+
+
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2014/05/20/图像增强之-imadjust自动确认阈值/" title="图像对比度增强之-imadjust">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  图像对比度增强之-imadjust</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2014/05/04/灰度共生矩阵/"  title="灰度共生矩阵（GLCM）">
+ <strong>NEXT:</strong><br/> 
+ <span>灰度共生矩阵（GLCM）
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+<div id="asidepart">
+
+<aside class="clearfix">
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Copyright  © 2015 
+		snail
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>

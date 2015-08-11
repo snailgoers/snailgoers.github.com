@@ -1,0 +1,435 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>图像预处理之：对比度增强 | Opengcl</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="snailgoers">
+    
+    <meta name="description" content="这次主要针对真彩色图像做的增强，将RGB域转为HSI域，增强I分量，达到增强效果，效果如下：代码如下：    
+#define MIN(a, b) ((a) &amp;lt; (b) ? (a) : (b))    
+#define MAX(a, b) ((a) &amp;gt; (b) ? (a) : (b)) ">
+    
+    
+    <meta name="keywords" content="算法设计学习分享,图像处理,计算几何,通用计算库">
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div>
+		
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Opengcl">Opengcl</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/algorithm">Alogrithm</a></li>
+					
+						<li><a href="/application">App</a></li>
+					
+						<li><a href="/life">Life</a></li>
+					
+						<li><a href="/about">About</a></li>
+					
+					<li>
+					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
+						<input type="hidden" name="q" value="site:opengcl.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2014/08/13/图像增强/" title="图像预处理之：对比度增强" itemprop="url">图像预处理之：对比度增强</a>
+  </h1>
+  <p class="article-author">By
+    
+      <a href="http://opengcl.com" title="snailgoers">snailgoers</a>
+    </p>
+  <p class="article-time">
+    <time datetime="2014-08-13T07:37:34.000Z" itemprop="datePublished">Aug 13 2014</time>
+    更新日期:<time datetime="2014-08-13T07:51:20.000Z" itemprop="dateModified">Aug 13 2014</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		
+		<p>这次主要针对真彩色图像做的增强，将RGB域转为HSI域，增强I分量，达到增强效果，效果如下：<br><img src="http://snailgoers.qiniudn.com/Desert.jpg" alt="原始图像"><br><img src="http://snailgoers.qiniudn.com/out.bmp" alt="增强后图像"><br>代码如下：    </p>
+<pre><code><span class="preprocessor">#<span class="keyword">define</span> MIN(a, b) ((a) &lt; (b) ? (a) : (b))    </span>
+<span class="preprocessor">#<span class="keyword">define</span> MAX(a, b) ((a) &gt; (b) ? (a) : (b))    </span>
+<span class="preprocessor">#<span class="keyword">define</span> EPS <span class="number">1e-16</span> </span>
+
+<span class="comment">/// 彩色空间转换</span>
+<span class="function"><span class="keyword">bool</span> <span class="title">RGB2HSI</span><span class="params">(uchar *imgIn, <span class="keyword">int</span> nchannels, <span class="keyword">double</span> *Hvector, <span class="keyword">double</span> *Svector, <span class="keyword">double</span> *Ivector, <span class="keyword">int</span> width, <span class="keyword">int</span> height)</span>
+</span>{
+    <span class="keyword">if</span> (imgIn == <span class="literal">NULL</span> || nchannels != <span class="number">3</span>)
+    {
+        <span class="keyword">return</span> <span class="literal">false</span>;
+    }
+    <span class="keyword">int</span> index = <span class="number">0</span>;
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; width * height * nchannels; i = i + <span class="number">3</span>)
+    {
+        <span class="keyword">double</span> b = imgIn[i + <span class="number">0</span>] / <span class="number">255.0</span>;
+        <span class="keyword">double</span> g = imgIn[i + <span class="number">1</span>] / <span class="number">255.0</span>;
+        <span class="keyword">double</span> r = imgIn[i + <span class="number">2</span>] / <span class="number">255.0</span>;
+        <span class="keyword">double</span> num = <span class="number">0.5</span> * (r - g + r - b);
+        <span class="keyword">double</span> den = <span class="built_in">sqrt</span>((r - g) * (r - g) + (r - b) * (g - b));
+        <span class="keyword">double</span> theta = <span class="built_in">acos</span>(num / (den + EPS));
+        <span class="keyword">double</span> hh = theta;
+        <span class="keyword">if</span> (b &gt; g)
+        {
+            hh = <span class="number">2</span> * PI - hh;
+        }
+        hh /= <span class="number">2</span> * PI;
+        num = MIN(MIN(r, g), b);
+        den = r + g + b;
+        <span class="keyword">double</span> ss = <span class="number">1</span> - <span class="number">3</span> * num / (den + EPS);
+        <span class="keyword">if</span> (ss == <span class="number">0</span>)
+        {
+            hh = <span class="number">0</span>;
+        }
+        <span class="keyword">double</span> ii = (r + g + b) / <span class="number">3</span>;
+        Hvector[index] = hh;
+        Svector[index] = ss;
+        Ivector[index++] = ii;
+    }
+
+    <span class="keyword">return</span> <span class="literal">true</span>;
+}
+
+<span class="function"><span class="keyword">bool</span> <span class="title">HSI2RGB</span><span class="params">(<span class="keyword">double</span> *Hvector, <span class="keyword">double</span> *Svector, <span class="keyword">double</span> *Ivector, uchar *imgOut, <span class="keyword">int</span> width, <span class="keyword">int</span> height)</span>
+</span>{
+    <span class="keyword">if</span> (Hvector == <span class="literal">NULL</span> || Svector == <span class="literal">NULL</span> || Ivector == <span class="literal">NULL</span>)
+    {
+        <span class="keyword">return</span> <span class="literal">false</span>;
+    }
+    <span class="keyword">int</span> index = <span class="number">0</span>;
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; height * width; i++)
+    {
+        <span class="keyword">double</span> hh = Hvector[i] * <span class="number">2</span> * PI;
+        <span class="keyword">double</span> ss = Svector[i];
+        <span class="keyword">double</span> ii = Ivector[i];
+        <span class="keyword">double</span> B, G, R;
+        <span class="keyword">if</span> (hh &gt;= <span class="number">0</span> &amp;&amp; hh &lt; <span class="number">2</span> * PI / <span class="number">3</span>)
+        { 
+            B = ii * (<span class="number">1</span> - ss);
+            R = ii * (<span class="number">1</span> + <span class="function">ss * <span class="title">cos</span><span class="params">(hh)</span> / <span class="title">cos</span><span class="params">(PI / <span class="number">3</span> - hh)</span>)</span>;
+            G = <span class="number">3</span> * ii - R - B;
+        }
+        <span class="keyword">else</span> <span class="keyword">if</span> (hh &gt;= <span class="number">2</span> * PI / <span class="number">3</span> &amp;&amp; hh &lt; <span class="number">4</span> * PI / <span class="number">3</span>)
+        {
+            R = ii * (<span class="number">1</span> - ss);
+            G = ii * (<span class="number">1</span> + <span class="function">ss * <span class="title">cos</span><span class="params">(hh - <span class="number">2</span> * PI / <span class="number">3</span>)</span> / <span class="title">cos</span><span class="params">(PI - hh)</span>)</span>;
+            B = <span class="number">3</span> * ii - R - G;
+        }
+        <span class="keyword">else</span> <span class="keyword">if</span> (hh &gt;= <span class="number">4</span> * PI / <span class="number">3</span> &amp;&amp; hh &lt;= <span class="number">2</span> * PI)
+        {
+            G = ii * (<span class="number">1</span> - ss);
+            B = ii * (<span class="number">1</span> + <span class="function">ss * <span class="title">cos</span><span class="params">(hh - <span class="number">4</span> * PI / <span class="number">3</span>)</span> / <span class="title">cos</span><span class="params">(<span class="number">5</span> * PI / <span class="number">3</span> - hh)</span>)</span>;
+            R = <span class="number">3</span> * ii - G - B;
+        }
+        R = MAX(<span class="number">0</span>, MIN(<span class="number">1</span>, R));
+        G = MAX(<span class="number">0</span>, MIN(<span class="number">1</span>, G));
+        B = MAX(<span class="number">0</span>, MIN(<span class="number">1</span>, B));
+
+        imgOut[index++] = uchar(B * <span class="number">255</span>);
+        imgOut[index++] = uchar(G * <span class="number">255</span>);
+        imgOut[index++] = uchar(R * <span class="number">255</span>);
+    }
+    <span class="keyword">return</span> <span class="literal">true</span>;
+}
+
+<span class="comment">/// 对比度增强</span>
+<span class="function"><span class="keyword">bool</span> <span class="title">ImAdjust</span><span class="params">(uchar *imgIn, uchar *imgOut, <span class="keyword">int</span> width, <span class="keyword">int</span> height, <span class="keyword">int</span> nchannels, 
+              <span class="keyword">double</span> low_in, <span class="keyword">double</span> high_in, <span class="keyword">double</span> low_out, <span class="keyword">double</span> high_out, <span class="keyword">double</span> gamma)</span>
+</span>{
+    <span class="keyword">if</span> (imgIn == <span class="literal">NULL</span> || !(nchannels == <span class="number">1</span> || nchannels == <span class="number">3</span>) || low_in &lt; <span class="number">0</span> || low_in &gt; <span class="number">1</span> ||
+        high_in &lt; low_in || high_in &gt; <span class="number">1</span> || low_out &lt; <span class="number">0</span> || low_out &gt; <span class="number">1</span> || high_out &lt; low_out || high_out &gt; <span class="number">1</span>)
+    {
+        <span class="keyword">return</span> <span class="literal">false</span>;
+    }
+
+    <span class="keyword">if</span> ( nchannels == <span class="number">1</span>)
+    {
+        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; height * width; i++)
+        {
+            <span class="keyword">if</span> (imgIn[i] &lt; low_in * <span class="number">255</span>)
+            {
+                imgOut[i] = uchar(low_out * <span class="number">255</span>);
+            }
+            <span class="keyword">else</span> <span class="keyword">if</span> (imgIn[i] &gt; high_in * <span class="number">255</span>)
+            {
+                imgOut[i] = uchar(high_out * <span class="number">255</span>);
+            }
+            <span class="keyword">else</span>
+            {
+                <span class="keyword">double</span> temp = <span class="built_in">pow</span>((<span class="keyword">double</span>(imgIn[i]) - low_in * <span class="number">255</span>) / (<span class="number">255</span> *(high_in - low_in)), gamma) *
+                    (high_out - low_out) * <span class="number">255</span> + low_out * <span class="number">255</span>; 
+                imgOut[i] = uchar(temp);
+            }
+        }
+    }
+    <span class="keyword">else</span> <span class="keyword">if</span> (nchannels == <span class="number">3</span>)
+    {
+        <span class="keyword">double</span> *Hvector = <span class="keyword">new</span> <span class="keyword">double</span>[width * height];
+        <span class="keyword">double</span> *Svector = <span class="keyword">new</span> <span class="keyword">double</span>[width * height];
+        <span class="keyword">double</span> *Ivector = <span class="keyword">new</span> <span class="keyword">double</span>[width * height];
+
+        <span class="keyword">if</span> (!RGB2HSI(imgIn, nchannels, Hvector, Svector, Ivector, width, height))
+        {
+            <span class="keyword">delete</span>[] Hvector;
+            <span class="keyword">delete</span>[] Svector;
+            <span class="keyword">delete</span>[] Ivector;
+            <span class="keyword">return</span> <span class="literal">false</span>;
+        }
+        <span class="comment">// enhancement the I vector</span>
+        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; width * height; i++)
+        {
+            <span class="keyword">if</span> (Ivector[i] &lt; low_in)
+            {
+                Ivector[i] = low_out;
+            }
+            <span class="keyword">else</span> <span class="keyword">if</span> (Ivector[i] &gt; high_in)
+            {
+                Ivector[i] = high_out;
+            }
+            <span class="keyword">else</span>
+            {
+                <span class="keyword">double</span> temp = <span class="built_in">pow</span>((Ivector[i] - low_in) / (high_in - low_in), gamma) *
+                    (high_out - low_out) + low_out; 
+                <span class="keyword">if</span> (temp &lt; low_out)
+                {
+                    temp = low_out;
+                }
+                <span class="keyword">if</span> (temp &gt; high_out)
+                {
+                    temp = high_out;
+                }
+                Ivector[i] = temp;
+            }
+        }
+
+        HSI2RGB(Hvector, Svector, Ivector, imgOut, width, height);
+
+        <span class="keyword">delete</span>[] Hvector;
+        <span class="keyword">delete</span>[] Svector;
+        <span class="keyword">delete</span>[] Ivector;
+    }
+
+
+
+    <span class="keyword">return</span> <span class="literal">true</span>;
+}
+</code></pre>  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/C-C/">C/C++</a><a href="/tags/图像预处理/">图像预处理</a><a href="/tags/彩色空间转换/">彩色空间转换</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/算法/">算法</a>
+</div>
+
+
+
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2014/08/15/根据旋转前后向量确定旋转矩阵/" title="根据旋转前后向量求旋转矩阵">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  根据旋转前后向量求旋转矩阵</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2014/08/11/“李妈妈”牛肉面/"  title="“李妈妈”牛肉面">
+ <strong>NEXT:</strong><br/> 
+ <span>“李妈妈”牛肉面
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+<div id="asidepart">
+
+<aside class="clearfix">
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Copyright  © 2015 
+		snail
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+
+
+  </body>
+</html>
