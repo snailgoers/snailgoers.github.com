@@ -19,7 +19,7 @@ Here and henceforth, the sums run over the range 1 &amp;lt;= n &amp;lt;= r.
 Now take the partial derivatives of F with respect to A, B, and C, andset them equal to zero. This will give you a set of three simultaneousnonlinear equations in A, B, and C, and you need to solve them. Theywill be polynomial, of degree 3. When I did this, the equations turnedout to be">
     
     
-    <meta name="keywords" content="算法设计学习分享,图像处理,计算几何,通用计算库">
+    <meta name="keywords" content="算法,设计,学习,分享,图像处理,计算几何,通用计算库,视频处理,人工智能,大数据处理,智能家居">
     
     
     
@@ -29,45 +29,30 @@ Now take the partial derivatives of F with respect to A, B, and C, andset them e
     
     <link rel="apple-touch-icon" href="/img/pacman.jpg">
     <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
     
     <link rel="stylesheet" href="/css/style.css" type="text/css">
 </head>
 
   <body>
     <header>
-      <div>
-		
-			<div id="textlogo">
-				<h1 class="site-name"><a href="/" title="Opengcl">Opengcl</a></h1>
-				<h2 class="blog-motto"></h2>
-			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
-			</a></div>
-			<nav class="animated">
-				<ul>
-					<ul>
-					 
-						<li><a href="/">Home</a></li>
-					
-						<li><a href="/algorithm">Alogrithm</a></li>
-					
-						<li><a href="/application">App</a></li>
-					
-						<li><a href="/life">Life</a></li>
-					
-						<li><a href="/about">About</a></li>
-					
-					<li>
-					
-					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
-						<label>Search</label>
-						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
-						<input type="hidden" name="q" value="site:opengcl.com">
-					</form>
-					
-					</li>
-				</ul>
-			</nav>			
+      <div id="header">
+    <div id="textlogo">
+        <h1><a href="/" title="Opengcl">Opengcl</a></h1>
+    </div>
+    <nav id="nav" role="navigation">
+         <ul>
+             
+                <li><a href="/">Home</a></li>
+            
+                <li><a href="/categories">Categories</a></li>
+            
+                <li><a href="/archives">Archives</a></li>
+            
+                <li><a href="/about">About</a></li>
+            
+        </ul>
+    </nav>
 </div>
 
     </header>
@@ -77,20 +62,21 @@ Now take the partial derivatives of F with respect to A, B, and C, andset them e
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/08/11/直线拟合之最小二乘法AX+BY+C=0/" title="直线拟合之最小二乘法AX+BY+C=0" itemprop="url">直线拟合之最小二乘法AX+BY+C=0</a>
+      <a href="/2015/08/14/直线拟合之最小二乘法AX+BY+C=0/" title="直线拟合之最小二乘法AX+BY+C=0" itemprop="url">直线拟合之最小二乘法AX+BY+C=0</a>
   </h1>
-  <p class="article-author">By
-    
-      <a href="http://opengcl.com" title="snailgoers">snailgoers</a>
-    </p>
+
   <p class="article-time">
-    <time datetime="2015-08-11T13:14:19.000Z" itemprop="datePublished">Aug 11 2015</time>
-    更新日期:<time datetime="2014-09-01T01:42:11.000Z" itemprop="dateModified">Sep 1 2014</time>
-    
+    <time datetime="2015-08-14T13:48:55.000Z" itemprop="datePublished">Aug 14 2015</time>
   </p>
 </header>
+
 	<div class="article-content">
 		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+		</div>
 		
 		<p>最小二乘法拟合直线，对于大多数人都不是很陌生，直线方程 y=kx+b，令sum((y-kx-b)^2)，分别对k和b求导便可求出最佳的参数，但是如果遇到诸如“X=5”这样的直线方程，又该如何呢？这时候就不再适用了，<a href="http://mathforum.org/library/drmath/view/51809.html" target="_blank" rel="external">参考</a>这个方法，这样拟合出来的才是直线的一般方程。</p>
 <p>Let the line sought be A<em>x + B</em>y + C = 0, with no restriction on A, B,<br>and C, except not both of A and B are zero. Then the distance from a<br>point (x[n],y[n]) to this line is given by</p>
@@ -143,7 +129,7 @@ A^2 + [(s^2-t^2-r<span class="keyword">*</span>u+r<span class="keyword">*</span>
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/2015/08/11/“打”城管技术指南/" title="">
+ <a href="/2015/08/14/“打”城管技术指南/" title="">
   <strong>PREVIOUS:</strong><br/>
   <span>
   (no title)</span>
@@ -152,9 +138,9 @@ A^2 + [(s^2-t^2-r<span class="keyword">*</span>u+r<span class="keyword">*</span>
 
 
 <div class="next">
-<a href="/2015/08/11/hello-world/"  title="Hello World">
+<a href="/2015/08/14/矩阵的旋转平移正变换及反变换/"  title="矩阵的旋转平移正变换及反变换">
  <strong>NEXT:</strong><br/> 
- <span>Hello World
+ <span>矩阵的旋转平移正变换及反变换
 </span>
 </a>
 </div>
@@ -165,12 +151,20 @@ A^2 + [(s^2-t^2-r<span class="keyword">*</span>u+r<span class="keyword">*</span>
 </div>  
       <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
 
-<div id="asidepart">
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  
+  </div>
 
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
 <aside class="clearfix">
+
+
 
 </aside>
 </div>
+
     </div>
     <footer><div id="footer" >
 	
@@ -181,8 +175,10 @@ A^2 + [(s^2-t^2-r<span class="keyword">*</span>u+r<span class="keyword">*</span>
 		
 		
 	</div>
-		<p class="copyright">Copyright  © 2015 
-		snail
+		<p class="copyright">Copyright © 2015
+		
+		snailgoers
+		
 		</p>
 </div>
 </footer>
@@ -213,6 +209,8 @@ $(document).ready(function(){
       m.removeClass('moveMain');
       a.css('display', 'block').removeClass('fadeOut');
       o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
         
     }
   });
@@ -296,7 +294,29 @@ $(document).ready(function(){
 
 
 
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
 
 
   </body>
 </html>
+

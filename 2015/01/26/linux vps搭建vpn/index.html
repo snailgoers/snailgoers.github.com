@@ -12,7 +12,7 @@
     <meta name="description" content="最近因为一直在整理自己的bolg，申请了新的域名，如域名所说，开源通用计算库，有点大，但是自己一直都在努力，将自己学习到的、用到的一些知识分享给所有感兴趣的朋友，遇到问题，还请多提意见。出于爱好，最近又买了一个vps，很mini的，当然价格很便宜，一年9刀，玩玩足矣，一是搭建一个vpn，用于查资料，">
     
     
-    <meta name="keywords" content="算法设计学习分享,图像处理,计算几何,通用计算库">
+    <meta name="keywords" content="算法,设计,学习,分享,图像处理,计算几何,通用计算库,视频处理,人工智能,大数据处理,智能家居">
     
     
     
@@ -22,45 +22,30 @@
     
     <link rel="apple-touch-icon" href="/img/pacman.jpg">
     <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
     
     <link rel="stylesheet" href="/css/style.css" type="text/css">
 </head>
 
   <body>
     <header>
-      <div>
-		
-			<div id="textlogo">
-				<h1 class="site-name"><a href="/" title="Opengcl">Opengcl</a></h1>
-				<h2 class="blog-motto"></h2>
-			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
-			</a></div>
-			<nav class="animated">
-				<ul>
-					<ul>
-					 
-						<li><a href="/">Home</a></li>
-					
-						<li><a href="/algorithm">Alogrithm</a></li>
-					
-						<li><a href="/application">App</a></li>
-					
-						<li><a href="/life">Life</a></li>
-					
-						<li><a href="/about">About</a></li>
-					
-					<li>
-					
-					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
-						<label>Search</label>
-						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
-						<input type="hidden" name="q" value="site:opengcl.com">
-					</form>
-					
-					</li>
-				</ul>
-			</nav>			
+      <div id="header">
+    <div id="textlogo">
+        <h1><a href="/" title="Opengcl">Opengcl</a></h1>
+    </div>
+    <nav id="nav" role="navigation">
+         <ul>
+             
+                <li><a href="/">Home</a></li>
+            
+                <li><a href="/categories">Categories</a></li>
+            
+                <li><a href="/archives">Archives</a></li>
+            
+                <li><a href="/about">About</a></li>
+            
+        </ul>
+    </nav>
 </div>
 
     </header>
@@ -72,18 +57,19 @@
     
       <a href="/2015/01/26/linux vps搭建vpn/" title="Linux Vps 搭建Vpn" itemprop="url">Linux Vps 搭建Vpn</a>
   </h1>
-  <p class="article-author">By
-    
-      <a href="http://opengcl.com" title="snailgoers">snailgoers</a>
-    </p>
+
   <p class="article-time">
     <time datetime="2015-01-26T07:03:02.000Z" itemprop="datePublished">Jan 26 2015</time>
-    更新日期:<time datetime="2015-01-30T08:33:35.000Z" itemprop="dateModified">Jan 30 2015</time>
-    
   </p>
 </header>
+
 	<div class="article-content">
 		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+		</div>
 		
 		<p>最近因为一直在整理自己的bolg，<a href="opengcl.com">申请了新的域名</a>，如域名所说，开源通用计算库，有点大，但是自己一直都在努力，将自己学习到的、用到的一些知识分享给所有感兴趣的朋友，遇到问题，还请多提意见。出于爱好，最近又买了一个vps，很mini的，当然价格很便宜，一年9刀，玩玩足矣，一是搭建一个vpn，用于查资料，另一个目的就是把自己的博客也迁移过去，顺便迁移到wordpress上面，一直在用hexo，感觉到随着bolg的增容会越来越慢，更关键的是没有电脑无法更新博客，也许wordpress是个不错的选择。<br>下面这多是在linux centos6.0 32位机器上搭建vpn的过程</p>
 <p>###代码</p>
@@ -184,10 +170,10 @@ rm -rf *.rpm
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/2015/08/11/矩阵的旋转平移正变换及反变换/" title="矩阵的旋转平移正变换及反变换">
+ <a href="/2015/04/22/图像匹配之最小面积外接矩形/" title="图像匹配之最小面积矩形">
   <strong>PREVIOUS:</strong><br/>
   <span>
-  矩阵的旋转平移正变换及反变换</span>
+  图像匹配之最小面积矩形</span>
 </a>
 </div>
 
@@ -206,12 +192,20 @@ rm -rf *.rpm
 </div>  
       <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
 
-<div id="asidepart">
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  
+  </div>
 
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
 <aside class="clearfix">
+
+
 
 </aside>
 </div>
+
     </div>
     <footer><div id="footer" >
 	
@@ -222,8 +216,10 @@ rm -rf *.rpm
 		
 		
 	</div>
-		<p class="copyright">Copyright  © 2015 
-		snail
+		<p class="copyright">Copyright © 2015
+		
+		snailgoers
+		
 		</p>
 </div>
 </footer>
@@ -254,6 +250,8 @@ $(document).ready(function(){
       m.removeClass('moveMain');
       a.css('display', 'block').removeClass('fadeOut');
       o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
         
     }
   });
@@ -337,7 +335,29 @@ $(document).ready(function(){
 
 
 
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
 
 
   </body>
 </html>
+

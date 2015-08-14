@@ -17,7 +17,7 @@ P(i,j)=#｛(x1,y1),(x2,y2)∈M×N｜f(x1,y1)=i,f(x2,y2)=j｝
 纹理特征提取的一种有效方法是以灰度级的空间相关矩阵即共生矩阵为基础的［7］，因为图像中相距(Δx，Δy)的两个灰度像素同时出现的联合频率分布可以用灰度共生矩阵来表示。若将图像的灰度级定为N级，那么共生矩阵为N×N矩阵，可表示为M(Δx，Δy)(h,k)，其中位于(h,k)的元素mhk的值表示一个灰度为h而另一个灰度为k的两个相距为(Δx，Δy)的像素对出现的次数。">
     
     
-    <meta name="keywords" content="算法设计学习分享,图像处理,计算几何,通用计算库">
+    <meta name="keywords" content="算法,设计,学习,分享,图像处理,计算几何,通用计算库,视频处理,人工智能,大数据处理,智能家居">
     
     
     
@@ -27,45 +27,30 @@ P(i,j)=#｛(x1,y1),(x2,y2)∈M×N｜f(x1,y1)=i,f(x2,y2)=j｝
     
     <link rel="apple-touch-icon" href="/img/pacman.jpg">
     <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
     
     <link rel="stylesheet" href="/css/style.css" type="text/css">
 </head>
 
   <body>
     <header>
-      <div>
-		
-			<div id="textlogo">
-				<h1 class="site-name"><a href="/" title="Opengcl">Opengcl</a></h1>
-				<h2 class="blog-motto"></h2>
-			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
-			</a></div>
-			<nav class="animated">
-				<ul>
-					<ul>
-					 
-						<li><a href="/">Home</a></li>
-					
-						<li><a href="/algorithm">Alogrithm</a></li>
-					
-						<li><a href="/application">App</a></li>
-					
-						<li><a href="/life">Life</a></li>
-					
-						<li><a href="/about">About</a></li>
-					
-					<li>
-					
-					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
-						<label>Search</label>
-						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
-						<input type="hidden" name="q" value="site:opengcl.com">
-					</form>
-					
-					</li>
-				</ul>
-			</nav>			
+      <div id="header">
+    <div id="textlogo">
+        <h1><a href="/" title="Opengcl">Opengcl</a></h1>
+    </div>
+    <nav id="nav" role="navigation">
+         <ul>
+             
+                <li><a href="/">Home</a></li>
+            
+                <li><a href="/categories">Categories</a></li>
+            
+                <li><a href="/archives">Archives</a></li>
+            
+                <li><a href="/about">About</a></li>
+            
+        </ul>
+    </nav>
 </div>
 
     </header>
@@ -77,18 +62,19 @@ P(i,j)=#｛(x1,y1),(x2,y2)∈M×N｜f(x1,y1)=i,f(x2,y2)=j｝
     
       <a href="/2014/05/04/灰度共生矩阵/" title="灰度共生矩阵（GLCM）" itemprop="url">灰度共生矩阵（GLCM）</a>
   </h1>
-  <p class="article-author">By
-    
-      <a href="http://opengcl.com" title="snailgoers">snailgoers</a>
-    </p>
+
   <p class="article-time">
     <time datetime="2014-05-04T05:22:18.000Z" itemprop="datePublished">May 4 2014</time>
-    更新日期:<time datetime="2014-09-01T01:45:02.000Z" itemprop="dateModified">Sep 1 2014</time>
-    
   </p>
 </header>
+
 	<div class="article-content">
 		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+		</div>
 		
 		<p>共生矩阵用两个位置的象素的联合概率密度来定义，它不仅反映亮度的分布特性，也反映具有同样亮度或接近亮度的象素之间的位置分布特性，是有关图象亮度变化的二阶统计特征。它是定义一组纹理特征的基础。</p>
 <p>一幅图象的灰度共生矩阵能反映出图象灰度关于方向、相邻间隔、变化幅度的综合信息，它是分析图象的局部模式和它们排列规则的基础。</p>
@@ -273,12 +259,20 @@ T(7) = mean(C); T(8) = sqrt(cov(C));
 </div>  
       <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
 
-<div id="asidepart">
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  
+  </div>
 
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
 <aside class="clearfix">
+
+
 
 </aside>
 </div>
+
     </div>
     <footer><div id="footer" >
 	
@@ -289,8 +283,10 @@ T(7) = mean(C); T(8) = sqrt(cov(C));
 		
 		
 	</div>
-		<p class="copyright">Copyright  © 2015 
-		snail
+		<p class="copyright">Copyright © 2015
+		
+		snailgoers
+		
 		</p>
 </div>
 </footer>
@@ -321,6 +317,8 @@ $(document).ready(function(){
       m.removeClass('moveMain');
       a.css('display', 'block').removeClass('fadeOut');
       o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
         
     }
   });
@@ -404,7 +402,29 @@ $(document).ready(function(){
 
 
 
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
 
 
   </body>
 </html>
+

@@ -12,7 +12,7 @@
     <meta name="description" content="最近由于项目需求，要计算任意点到斜椭圆的距离，方程相信大家都知道怎么建立，但是它是一个4次方程，matlab都很不好解，写到程序中也很难，搜了很多帖子，都是只给方程，不给解的，其实原理大家都知道，如何用程序解才是大家关心的，所以一直都没有找到合理的答案，关键时刻还是google给力，度娘一般的东西还">
     
     
-    <meta name="keywords" content="算法设计学习分享,图像处理,计算几何,通用计算库">
+    <meta name="keywords" content="算法,设计,学习,分享,图像处理,计算几何,通用计算库,视频处理,人工智能,大数据处理,智能家居">
     
     
     
@@ -22,45 +22,30 @@
     
     <link rel="apple-touch-icon" href="/img/pacman.jpg">
     <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
     
     <link rel="stylesheet" href="/css/style.css" type="text/css">
 </head>
 
   <body>
     <header>
-      <div>
-		
-			<div id="textlogo">
-				<h1 class="site-name"><a href="/" title="Opengcl">Opengcl</a></h1>
-				<h2 class="blog-motto"></h2>
-			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
-			</a></div>
-			<nav class="animated">
-				<ul>
-					<ul>
-					 
-						<li><a href="/">Home</a></li>
-					
-						<li><a href="/algorithm">Alogrithm</a></li>
-					
-						<li><a href="/application">App</a></li>
-					
-						<li><a href="/life">Life</a></li>
-					
-						<li><a href="/about">About</a></li>
-					
-					<li>
-					
-					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
-						<label>Search</label>
-						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
-						<input type="hidden" name="q" value="site:opengcl.com">
-					</form>
-					
-					</li>
-				</ul>
-			</nav>			
+      <div id="header">
+    <div id="textlogo">
+        <h1><a href="/" title="Opengcl">Opengcl</a></h1>
+    </div>
+    <nav id="nav" role="navigation">
+         <ul>
+             
+                <li><a href="/">Home</a></li>
+            
+                <li><a href="/categories">Categories</a></li>
+            
+                <li><a href="/archives">Archives</a></li>
+            
+                <li><a href="/about">About</a></li>
+            
+        </ul>
+    </nav>
 </div>
 
     </header>
@@ -72,18 +57,19 @@
     
       <a href="/2014/05/15/点到斜椭圆最小距离/" title="任意点到斜椭圆最小距离" itemprop="url">任意点到斜椭圆最小距离</a>
   </h1>
-  <p class="article-author">By
-    
-      <a href="http://opengcl.com" title="snailgoers">snailgoers</a>
-    </p>
+
   <p class="article-time">
     <time datetime="2014-05-15T07:24:10.000Z" itemprop="datePublished">May 15 2014</time>
-    更新日期:<time datetime="2014-09-01T01:46:57.000Z" itemprop="dateModified">Sep 1 2014</time>
-    
   </p>
 </header>
+
 	<div class="article-content">
 		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		<ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#任意象限的点到标准椭圆的距离"><span class="toc-number">1.</span> <span class="toc-text">任意象限的点到标准椭圆的距离</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#任意点到斜椭圆的距离"><span class="toc-number">2.</span> <span class="toc-text">任意点到斜椭圆的距离</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#效果展示"><span class="toc-number">3.</span> <span class="toc-text">效果展示</span></a></li></ol>
+		</div>
 		
 		<p>最近由于项目需求，要计算任意点到斜椭圆的距离，方程相信大家都知道怎么建立，但是它是一个4次方程，matlab都很不好解，写到程序中也很难，搜了很多帖子，都是只给方程，不给解的，其实原理大家都知道，如何用程序解才是大家关心的，所以一直都没有找到合理的答案，关键时刻还是google给力，度娘一般的东西还撮合，可学术性的、英文的确是一塌糊涂，网络上收集到这样一篇<a href="http://www.geometrictools.com/Documentation/DistancePointEllipseEllipsoid.pdf" target="_blank" rel="external">论文</a>,我也是用这个算法最终解决我的问题的，它只使用与标准方程，斜椭圆只是多了平移和旋转操作而已。</p>
 <p>###第一象限中的点到标准椭圆的距离###</p>
@@ -278,12 +264,20 @@
 </div>  
       <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
 
-<div id="asidepart">
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#任意象限的点到标准椭圆的距离"><span class="toc-number">1.</span> <span class="toc-text">任意象限的点到标准椭圆的距离</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#任意点到斜椭圆的距离"><span class="toc-number">2.</span> <span class="toc-text">任意点到斜椭圆的距离</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#效果展示"><span class="toc-number">3.</span> <span class="toc-text">效果展示</span></a></li></ol>
+  </div>
 
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
 <aside class="clearfix">
+
+
 
 </aside>
 </div>
+
     </div>
     <footer><div id="footer" >
 	
@@ -294,8 +288,10 @@
 		
 		
 	</div>
-		<p class="copyright">Copyright  © 2015 
-		snail
+		<p class="copyright">Copyright © 2015
+		
+		snailgoers
+		
 		</p>
 </div>
 </footer>
@@ -326,6 +322,8 @@ $(document).ready(function(){
       m.removeClass('moveMain');
       a.css('display', 'block').removeClass('fadeOut');
       o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
         
     }
   });
@@ -409,7 +407,29 @@ $(document).ready(function(){
 
 
 
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
 
 
   </body>
 </html>
+

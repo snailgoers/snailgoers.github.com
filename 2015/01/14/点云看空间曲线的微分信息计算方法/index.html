@@ -16,7 +16,7 @@ function [curveture,fT,fN,fB]=Frenet_Curveture(pt,k)
 %参考：点云空间曲线的微分信息计算及匹配">
     
     
-    <meta name="keywords" content="算法设计学习分享,图像处理,计算几何,通用计算库">
+    <meta name="keywords" content="算法,设计,学习,分享,图像处理,计算几何,通用计算库,视频处理,人工智能,大数据处理,智能家居">
     
     
     
@@ -26,45 +26,30 @@ function [curveture,fT,fN,fB]=Frenet_Curveture(pt,k)
     
     <link rel="apple-touch-icon" href="/img/pacman.jpg">
     <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
     
     <link rel="stylesheet" href="/css/style.css" type="text/css">
 </head>
 
   <body>
     <header>
-      <div>
-		
-			<div id="textlogo">
-				<h1 class="site-name"><a href="/" title="Opengcl">Opengcl</a></h1>
-				<h2 class="blog-motto"></h2>
-			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
-			</a></div>
-			<nav class="animated">
-				<ul>
-					<ul>
-					 
-						<li><a href="/">Home</a></li>
-					
-						<li><a href="/algorithm">Alogrithm</a></li>
-					
-						<li><a href="/application">App</a></li>
-					
-						<li><a href="/life">Life</a></li>
-					
-						<li><a href="/about">About</a></li>
-					
-					<li>
-					
-					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
-						<label>Search</label>
-						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
-						<input type="hidden" name="q" value="site:opengcl.com">
-					</form>
-					
-					</li>
-				</ul>
-			</nav>			
+      <div id="header">
+    <div id="textlogo">
+        <h1><a href="/" title="Opengcl">Opengcl</a></h1>
+    </div>
+    <nav id="nav" role="navigation">
+         <ul>
+             
+                <li><a href="/">Home</a></li>
+            
+                <li><a href="/categories">Categories</a></li>
+            
+                <li><a href="/archives">Archives</a></li>
+            
+                <li><a href="/about">About</a></li>
+            
+        </ul>
+    </nav>
 </div>
 
     </header>
@@ -76,18 +61,19 @@ function [curveture,fT,fN,fB]=Frenet_Curveture(pt,k)
     
       <a href="/2015/01/14/点云看空间曲线的微分信息计算方法/" title="Frenet标架及曲率挠率计算" itemprop="url">Frenet标架及曲率挠率计算</a>
   </h1>
-  <p class="article-author">By
-    
-      <a href="http://opengcl.com" title="snailgoers">snailgoers</a>
-    </p>
+
   <p class="article-time">
     <time datetime="2015-01-14T08:38:41.000Z" itemprop="datePublished">Jan 14 2015</time>
-    更新日期:<time datetime="2015-01-14T08:42:53.000Z" itemprop="dateModified">Jan 14 2015</time>
-    
   </p>
 </header>
+
 	<div class="article-content">
 		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+		</div>
 		
 		<p>此文算法基于马国庆等论文“点云空间曲线的微分信息计算及匹配方法”，引用请注明出处，在此感谢</p>
 <p>###Code</p>
@@ -191,12 +177,20 @@ end
 </div>  
       <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
 
-<div id="asidepart">
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  
+  </div>
 
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
 <aside class="clearfix">
+
+
 
 </aside>
 </div>
+
     </div>
     <footer><div id="footer" >
 	
@@ -207,8 +201,10 @@ end
 		
 		
 	</div>
-		<p class="copyright">Copyright  © 2015 
-		snail
+		<p class="copyright">Copyright © 2015
+		
+		snailgoers
+		
 		</p>
 </div>
 </footer>
@@ -239,6 +235,8 @@ $(document).ready(function(){
       m.removeClass('moveMain');
       a.css('display', 'block').removeClass('fadeOut');
       o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
         
     }
   });
@@ -322,7 +320,29 @@ $(document).ready(function(){
 
 
 
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
 
 
   </body>
 </html>
+

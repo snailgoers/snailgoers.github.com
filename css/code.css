@@ -1,0 +1,27 @@
+pre .comment {
+    color: #8e908c;
+}
+pre .title, pre .variable, pre .attribute, pre .tag, pre .regexp, pre .ruby .constant, pre .tag .title, pre .pi, pre .doctype, pre .id, pre .class, pre .pseudo {
+    color: #c82829;
+}
+pre .number, pre .preprocessor, pre .pragma, pre .built_in, pre .literal, pre .params, pre .constant {
+    color: #f5871f;
+}
+pre .class .title, pre .rules .attribute {
+    color: #eab700;
+}
+pre .string, pre .value, pre .inheritance, pre .header, pre .symbol, pre .cdata {
+    color: #718c00;
+}
+pre .css .hexcolor {
+    color: #3e999f;
+}
+pre .function, pre .function .title, pre .decorator, pre .python .title, pre .title .keyword, pre .perl .sub, pre .javascript .title, pre .coffeescript .title {
+    color: #4271ae;
+}
+pre .keyword, pre .javascript .function {
+    color: #8959a8;
+}
+pre .coffeescript .javascript, pre .javascript .xml, pre .tex .formula, pre .xml .javascript, pre .xml .vbscript, pre .xml .css, pre .xml .cdata {
+    opacity: 0.5;
+}

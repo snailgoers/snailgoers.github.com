@@ -9,10 +9,10 @@
     
     <meta name="author" content="snailgoers">
     
-    <meta name="description" content="算法设计学习分享,图像处理,计算几何,通用计算库">
+    <meta name="description" content="算法,设计,学习,分享,数字图像处理,视频处理,人工智能,模式识别,大数据处理,计算几何,通用计算库,智能家居">
     
     
-    <meta name="keywords" content="算法设计学习分享,图像处理,计算几何,通用计算库">
+    <meta name="keywords" content="算法,设计,学习,分享,图像处理,计算几何,通用计算库,视频处理,人工智能,大数据处理,智能家居">
     
     
     
@@ -22,50 +22,51 @@
     
     <link rel="apple-touch-icon" href="/img/pacman.jpg">
     <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
     
     <link rel="stylesheet" href="/css/style.css" type="text/css">
 </head>
 
   <body>
     <header>
-      <div>
-		
-			<div id="textlogo">
-				<h1 class="site-name"><a href="/" title="Opengcl">Opengcl</a></h1>
-				<h2 class="blog-motto"></h2>
-			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
-			</a></div>
-			<nav class="animated">
-				<ul>
-					<ul>
-					 
-						<li><a href="/">Home</a></li>
-					
-						<li><a href="/algorithm">Alogrithm</a></li>
-					
-						<li><a href="/application">App</a></li>
-					
-						<li><a href="/life">Life</a></li>
-					
-						<li><a href="/about">About</a></li>
-					
-					<li>
-					
-					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
-						<label>Search</label>
-						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
-						<input type="hidden" name="q" value="site:opengcl.com">
-					</form>
-					
-					</li>
-				</ul>
-			</nav>			
+      <div id="header">
+    <div id="textlogo">
+        <h1><a href="/" title="Opengcl">Opengcl</a></h1>
+    </div>
+    <nav id="nav" role="navigation">
+         <ul>
+             
+                <li><a href="/">Home</a></li>
+            
+                <li><a href="/categories">Categories</a></li>
+            
+                <li><a href="/archives">Archives</a></li>
+            
+                <li><a href="/about">About</a></li>
+            
+        </ul>
+    </nav>
 </div>
 
     </header>
     <div id="container">
       <div id="main">
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2015/01/14/只有旋转和平移的空间变换推导/" title="只有旋转和平移的变换矩阵推导" itemprop="url">
+  
+    <h1 itemprop="name">只有旋转和平移的变换矩阵推导</h1>
+    
+     
+           <p itemprop="description" >此处推导只针对二维情况，三维情况肯定也是合适的，暂时没有推导假设二维平面中有两条曲线，求一组变换矩阵，使得两条曲线的间距最小，自然而然大家第一个想到的就应该是最小二乘法，推导步骤如下所示
+
+但是在求得theta后，因为有正负之分，可能会相差180°，此时，再需比较一下两次变换后的</p>
+        
+    
+    <time datetime="2015-01-14T08:02:36.000Z" itemprop="datePublished">Jan 14 2015</time>
+  </a>
+</section>
 
   <section class="post" itemscope itemprop="blogPost">
   
@@ -209,36 +210,13 @@ INSERTION-SORT(A)
   </a>
 </section>
 
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2014/09/23/vs2008 output 输出结果/" title="vs2008 output 输出结果" itemprop="url">
-  
-    <h1 itemprop="name">vs2008 output 输出结果</h1>
-    
-     
-           <p itemprop="description" >在vs2008的时候，如果你想查看一些变量的值，一是可以输出到文本，一是可以添加到watch，但是对于一些数组指针，却不是很好使了，这时一个可行的方法是把结果直接打印到output窗口中：    
-#include &amp;lt;Windows.h&amp;gt;
-#include &amp;lt;t</p>
-        
-    
-    <time datetime="2014-09-23T05:56:44.000Z" itemprop="datePublished">Sep 23 2014</time>
-  </a>
-</section>
-
 
   <nav id="page-nav" class="clearfix">
     <a class="extend prev" rel="prev" href="/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/3/">Next &raquo;</a>
   </nav>
 
 </div>
-      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
 
-<div id="asidepart">
-
-<aside class="clearfix">
-
-</aside>
-</div>
     </div>
     <footer><div id="footer" >
 	
@@ -249,8 +227,10 @@ INSERTION-SORT(A)
 		
 		
 	</div>
-		<p class="copyright">Copyright  © 2015 
-		snail
+		<p class="copyright">Copyright © 2015
+		
+		snailgoers
+		
 		</p>
 </div>
 </footer>
@@ -308,3 +288,4 @@ $(document).ready(function(){
 
   </body>
  </html>
+

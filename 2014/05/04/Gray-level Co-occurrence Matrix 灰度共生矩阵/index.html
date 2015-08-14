@@ -13,7 +13,7 @@
 取图像(N×N)中任意一点（x，y）及偏离它的另一点（x+a，y+b），设该点对的灰度值为（g1，g2）。令点（x，y）在整个画面上移动，则会得到各种（g1，g2）。值，设灰度值的级数为，则（g1，g2）。的组合共有 k2种。对于整个画面，统计出每一种（g1，g2）值出现的次数，然后排列成一个方阵，在用（g1，g2）出现的总次数将它们归一化为出现的概率P（g1，g2），这样的方阵称为灰度共生矩阵。距离差分值（a，b）取不同的数值组合，可以得到不同情况下的联合概率矩阵。（a，b）取值要根据纹理周期分布的特性来选择，对于较细的纹理，选取（1，0）、（1，1）、（2，0）等小的差分值。">
     
     
-    <meta name="keywords" content="算法设计学习分享,图像处理,计算几何,通用计算库">
+    <meta name="keywords" content="算法,设计,学习,分享,图像处理,计算几何,通用计算库,视频处理,人工智能,大数据处理,智能家居">
     
     
     
@@ -23,45 +23,30 @@
     
     <link rel="apple-touch-icon" href="/img/pacman.jpg">
     <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
     
     <link rel="stylesheet" href="/css/style.css" type="text/css">
 </head>
 
   <body>
     <header>
-      <div>
-		
-			<div id="textlogo">
-				<h1 class="site-name"><a href="/" title="Opengcl">Opengcl</a></h1>
-				<h2 class="blog-motto"></h2>
-			</div>
-			<div class="navbar"><a class="navbutton navmobile" href="#" title="菜单">
-			</a></div>
-			<nav class="animated">
-				<ul>
-					<ul>
-					 
-						<li><a href="/">Home</a></li>
-					
-						<li><a href="/algorithm">Alogrithm</a></li>
-					
-						<li><a href="/application">App</a></li>
-					
-						<li><a href="/life">Life</a></li>
-					
-						<li><a href="/about">About</a></li>
-					
-					<li>
-					
-					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
-						<label>Search</label>
-						<input type="text" id="search" name="q" autocomplete="off" maxlength="20" placeholder="搜索" />
-						<input type="hidden" name="q" value="site:opengcl.com">
-					</form>
-					
-					</li>
-				</ul>
-			</nav>			
+      <div id="header">
+    <div id="textlogo">
+        <h1><a href="/" title="Opengcl">Opengcl</a></h1>
+    </div>
+    <nav id="nav" role="navigation">
+         <ul>
+             
+                <li><a href="/">Home</a></li>
+            
+                <li><a href="/categories">Categories</a></li>
+            
+                <li><a href="/archives">Archives</a></li>
+            
+                <li><a href="/about">About</a></li>
+            
+        </ul>
+    </nav>
 </div>
 
     </header>
@@ -73,18 +58,19 @@
     
       <a href="/2014/05/04/Gray-level Co-occurrence Matrix 灰度共生矩阵/" title="Gray-level Co-occurrence Matrix 灰度共生矩阵" itemprop="url">Gray-level Co-occurrence Matrix 灰度共生矩阵</a>
   </h1>
-  <p class="article-author">By
-    
-      <a href="http://opengcl.com" title="snailgoers">snailgoers</a>
-    </p>
+
   <p class="article-time">
     <time datetime="2014-05-04T05:19:31.000Z" itemprop="datePublished">May 4 2014</time>
-    更新日期:<time datetime="2014-09-01T01:45:45.000Z" itemprop="dateModified">Sep 1 2014</time>
-    
   </p>
 </header>
+
 	<div class="article-content">
 		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+		</div>
 		
 		<p>灰度共生矩阵就是一种通过研究灰度的空间相关特性来描述纹理的常用方法。<br>灰度共生矩阵是对图像上保持某距离的两象素分别具有某灰度的状况进行统计得到的。</p>
 <p>取图像(N×N)中任意一点（x，y）及偏离它的另一点（x+a，y+b），设该点对的灰度值为（g1，g2）。令点（x，y）在整个画面上移动，则会得到各种（g1，g2）。值，设灰度值的级数为，则（g1，g2）。的组合共有 k2种。对于整个画面，统计出每一种（g1，g2）值出现的次数，然后排列成一个方阵，在用（g1，g2）出现的总次数将它们归一化为出现的概率P（g1，g2），这样的方阵称为灰度共生矩阵。距离差分值（a，b）取不同的数值组合，可以得到不同情况下的联合概率矩阵。（a，b）取值要根据纹理周期分布的特性来选择，对于较细的纹理，选取（1，0）、（1，1）、（2，0）等小的差分值。</p>
@@ -153,12 +139,20 @@ stats = graycoprops(glcms,<span class="string">'Contrast Correlation energy'</sp
 </div>  
       <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
 
-<div id="asidepart">
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  
+  </div>
 
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
 <aside class="clearfix">
+
+
 
 </aside>
 </div>
+
     </div>
     <footer><div id="footer" >
 	
@@ -169,8 +163,10 @@ stats = graycoprops(glcms,<span class="string">'Contrast Correlation energy'</sp
 		
 		
 	</div>
-		<p class="copyright">Copyright  © 2015 
-		snail
+		<p class="copyright">Copyright © 2015
+		
+		snailgoers
+		
 		</p>
 </div>
 </footer>
@@ -201,6 +197,8 @@ $(document).ready(function(){
       m.removeClass('moveMain');
       a.css('display', 'block').removeClass('fadeOut');
       o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
         
     }
   });
@@ -284,7 +282,29 @@ $(document).ready(function(){
 
 
 
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
 
 
   </body>
 </html>
+

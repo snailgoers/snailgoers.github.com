@@ -1,0 +1,443 @@
+
+ <!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>图像匹配之最小面积矩形 | Opengcl</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
+    
+    <meta name="author" content="snailgoers">
+    
+    <meta name="description" content="图像匹配，设计到旋转平移及缩放，在目标轮廓清晰的情况下，可通过连通域的方法分割出每一个目标，然后可以依据pattern的几何特征过滤掉一大部分不满足要求的连通域，将满足要求的再旋转到一个特定的方向，即可解决旋转问题，继而采用多尺度方法就可解决最终的图像匹配问题，本节介绍的就是利用最小面积外接矩形的方">
+    
+    
+    <meta name="keywords" content="算法,设计,学习,分享,图像处理,计算几何,通用计算库,视频处理,人工智能,大数据处理,智能家居">
+    
+    
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/pacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/pacman.jpg">
+    <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+    
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+</head>
+
+  <body>
+    <header>
+      <div id="header">
+    <div id="textlogo">
+        <h1><a href="/" title="Opengcl">Opengcl</a></h1>
+    </div>
+    <nav id="nav" role="navigation">
+         <ul>
+             
+                <li><a href="/">Home</a></li>
+            
+                <li><a href="/categories">Categories</a></li>
+            
+                <li><a href="/archives">Archives</a></li>
+            
+                <li><a href="/about">About</a></li>
+            
+        </ul>
+    </nav>
+</div>
+
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2015/04/22/图像匹配之最小面积外接矩形/" title="图像匹配之最小面积矩形" itemprop="url">图像匹配之最小面积矩形</a>
+  </h1>
+
+  <p class="article-time">
+    <time datetime="2015-04-22T08:09:14.000Z" itemprop="datePublished">Apr 22 2015</time>
+  </p>
+</header>
+
+	<div class="article-content">
+		
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">文章目录</strong>
+		
+		</div>
+		
+		<p>图像匹配，设计到旋转平移及缩放，在目标轮廓清晰的情况下，可通过连通域的方法分割出每一个目标，然后可以依据pattern的几何特征过滤掉一大部分不满足要求的连通域，将满足要求的再旋转到一个特定的方向，即可解决旋转问题，继而采用多尺度方法就可解决最终的图像匹配问题，本节介绍的就是利用最小面积外接矩形的方法来解决旋转问题。<br>最小面积外接矩形，其原理是首先提取图像的有效像素的凸包，求点云凸包算法可以参考我之间的博客-<a href="http://opengcl.com/2014/08/27/%E8%AE%A1%E7%AE%97%E7%82%B9%E4%BA%91%E5%87%B8%E5%8C%85/" target="_blank" rel="external">凸包求取算法</a>，然后再求凸包的相邻点的梯度方向，将图像旋转对应方向，求旋转后有效像素的外接矩形的面积，在所有的凸包角度中，求最小面积对应的角度，既是旋转角度，但是这个算法也有不足，对图像的外部轮廓噪声十分敏感，当轮廓不够光滑时误差较大；无法正确区别0°、90°、180°、270°，之后需要添加另外的相关函数区分；精度不是很高，这也源于其对轮廓的高灵敏性，需要添加细分算法。</p>
+<p><img src="http://snailgoers.qiniudn.com/imageMatch_minareaRect.jpg" alt="效果图"></p>
+<p>###代码</p>
+<pre><code><span class="function"><span class="keyword">bool</span> <span class="title">MinAreaRect</span><span class="params">(GCLPOINT *pointsIn, <span class="keyword">int</span> num, <span class="keyword">double</span> *rectX, <span class="keyword">double</span> *rectY, <span class="keyword">double</span> &amp;convexHullArea)</span>
+</span>{
+    <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; index;
+    ConvexHull(pointsIn, num, index);
+    <span class="keyword">int</span> nptNum = index.size();
+    <span class="keyword">double</span> *x = <span class="keyword">new</span> <span class="keyword">double</span>[nptNum];
+    <span class="keyword">double</span> *y = <span class="keyword">new</span> <span class="keyword">double</span>[nptNum];
+    <span class="built_in">memset</span>(x, <span class="number">0</span>, <span class="keyword">sizeof</span>(<span class="keyword">double</span>) * nptNum);
+    <span class="built_in">memset</span>(y, <span class="number">0</span>, <span class="keyword">sizeof</span>(<span class="keyword">double</span>) * nptNum);
+    <span class="comment">//gcloutput(_T("\n\n**************************\n\n"));</span>
+    GCLPOINT *pt = <span class="keyword">new</span> GCLPOINT[nptNum];
+    <span class="built_in">memset</span>(pt, <span class="number">0</span>, <span class="keyword">sizeof</span>(GCLPOINT) * nptNum);
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; index.size(); i++)
+    {
+        x[i] = pointsIn[index[i]].x;
+        y[i] = pointsIn[index[i]].y;
+        pt[i].x = x[i];
+        pt[i].y = y[i];
+        <span class="comment">//gcloutput(_T("%f %f\n"), x[i], y[i]);</span>
+    }
+    convexHullArea = PolygonArea(pt, nptNum);
+    <span class="keyword">delete</span>[] pt;
+
+    <span class="comment">/*map&lt;double, int&gt; mapEigen;
+    int dex = 0;
+    for (int i = 0; i &lt; nptNum - 2; i++)
+    {
+        for (int j = i + 1; j &lt; nptNum; j++)
+        {
+            double theta = atan2(y[j] - y[i], x[j] - x[i]);
+            if (theta &gt;= PI / 2)
+            {
+                theta -= PI / 2;
+            }
+            else if (theta &lt; 0)
+            {
+                if (theta &gt;= - PI / 2)
+                {
+                    theta += PI / 2;
+                }
+                else
+                {
+                    theta += PI;
+                }
+            }
+            mapEigen.insert(make_pair(theta,dex++));
+        }
+    }
+    int nsize = mapEigen.size();*/</span>
+    <span class="comment">// theta 去重</span>
+    <span class="comment">//double *temp = new double[nsize];</span>
+    <span class="comment">//double *gama = new double[nsize];</span>
+    <span class="comment">//memset(gama, 0, sizeof(double) * nsize);</span>
+    <span class="comment">//memset(temp, 0, sizeof(double) * nsize);</span>
+    <span class="comment">//map&lt;double, int&gt;::iterator iter = mapEigen.begin();</span>
+    <span class="comment">//int findex = 0;</span>
+    <span class="comment">//for (;iter != mapEigen.end(); iter++)</span>
+    <span class="comment">//{</span>
+    <span class="comment">//    temp[findex++] = iter-&gt;first; // key value</span>
+    <span class="comment">//    printf("%f\n",iter-&gt;first);</span>
+    <span class="comment">//}</span>
+    <span class="comment">//int *nindex = new int[nsize];</span>
+    <span class="comment">//memset(nindex, 0, sizeof(int) * nsize);</span>
+    <span class="comment">//for (int i = 0; i &lt; nsize - 1; i++)</span>
+    <span class="comment">//{</span>
+    <span class="comment">//    for (int j = i + 1; j &lt; nsize; j++)</span>
+    <span class="comment">//    {</span>
+    <span class="comment">//        if (abs(temp[i] - temp[j]) &lt; 0.5 * PI / 180)</span>
+    <span class="comment">//        {</span>
+    <span class="comment">//            nindex[j] = 1;</span>
+    <span class="comment">//        }</span>
+    <span class="comment">//    }</span>
+    <span class="comment">//}</span>
+    <span class="comment">//int sumD = 0;</span>
+    <span class="comment">//for (int i = 0; i &lt; nsize; i++)</span>
+    <span class="comment">//{</span>
+    <span class="comment">//    if(nindex[i] != 1)</span>
+    <span class="comment">//    {</span>
+    <span class="comment">//        gama[sumD++] = temp[i];</span>
+    <span class="comment">//    }</span>
+    <span class="comment">//}</span>
+    <span class="comment">//for (int i = 0; i &lt; sumD; i++)</span>
+    <span class="comment">//{</span>
+    <span class="comment">//    printf("%f ",gama[i]);</span>
+    <span class="comment">//}</span>
+
+    <span class="built_in">map</span>&lt;<span class="keyword">double</span>, <span class="keyword">int</span>&gt; mapEignen;
+    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; nptNum - <span class="number">1</span>; i++)
+    {
+        <span class="keyword">double</span> temp = <span class="built_in">atan2</span>(y[i + <span class="number">1</span>] - y[i], x[i + <span class="number">1</span>] - x[i]);
+        temp = temp - <span class="built_in">floor</span>(temp / (PI / <span class="number">2</span>)) * PI / <span class="number">2</span>;
+        mapEignen.insert(make_pair(temp, i));
+    }
+
+    <span class="built_in">map</span>&lt;<span class="keyword">double</span>, <span class="keyword">int</span>&gt;::iterator iter = mapEignen.begin();
+
+    <span class="comment">// 计算最小面积矩形</span>
+    <span class="keyword">double</span> minArea = DBL_MAX;
+    <span class="keyword">for</span> (; iter != mapEignen.end(); iter++)
+    {
+        <span class="keyword">double</span> gama = iter-&gt;first;
+        <span class="keyword">double</span> *xx = <span class="keyword">new</span> <span class="keyword">double</span>[nptNum];
+        <span class="keyword">double</span> *yy = <span class="keyword">new</span> <span class="keyword">double</span>[nptNum];
+        <span class="built_in">memcpy</span>(xx, x, <span class="keyword">sizeof</span>(<span class="keyword">double</span>) * nptNum);
+        <span class="built_in">memcpy</span>(yy, y, <span class="keyword">sizeof</span>(<span class="keyword">double</span>) * nptNum);
+        Rmat(xx, yy, nptNum, -gama);
+        <span class="keyword">double</span> minX = DBL_MAX;
+        <span class="keyword">double</span> maxX = -DBL_MAX;
+        <span class="keyword">double</span> minY = DBL_MAX;
+        <span class="keyword">double</span> maxY = -DBL_MAX;
+        <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; nptNum; j++)
+        {
+            <span class="keyword">if</span> (xx[j] &gt; maxX)
+            {
+                maxX = xx[j];
+            }
+            <span class="keyword">if</span> (xx[j] &lt; minX)
+            {
+                minX = xx[j];
+            }
+            <span class="keyword">if</span> (yy[j] &gt; maxY)
+            {
+                maxY = yy[j];
+            }
+            <span class="keyword">if</span> (yy[j] &lt; minY)
+            {
+                minY = yy[j];
+            }
+        }
+        <span class="keyword">double</span> area = (maxY - minY) * (maxX - minX);
+        <span class="keyword">if</span> (area &lt; minArea)
+        {
+            minArea = area;
+            rectX[<span class="number">0</span>] = minX;
+            rectX[<span class="number">1</span>] = maxX;
+            rectX[<span class="number">2</span>] = maxX;
+            rectX[<span class="number">3</span>] = minX;
+
+            rectY[<span class="number">0</span>] = minY;
+            rectY[<span class="number">1</span>] = minY;
+            rectY[<span class="number">2</span>] = maxY;
+            rectY[<span class="number">3</span>] = maxY;
+            Rmat(rectX, rectY, <span class="number">4</span>, gama);
+        }
+        <span class="keyword">delete</span>[] xx;
+        <span class="keyword">delete</span>[] yy;
+    }
+
+    <span class="keyword">delete</span>[] x;
+    <span class="keyword">delete</span>[] y;
+
+    <span class="keyword">return</span> <span class="literal">true</span>;
+}
+</code></pre>  
+	</div>
+		<footer class="article-footer clearfix">
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/凸包/">凸包</a><a href="/tags/图像匹配/">图像匹配</a>
+  </div>
+
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/算法/">算法</a>
+</div>
+
+
+
+</footer>   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2015/04/22/PCA图像主方向/" title="pca确定图像主方向">
+  <strong>PREVIOUS:</strong><br/>
+  <span>
+  pca确定图像主方向</span>
+</a>
+</div>
+
+
+<div class="next">
+<a href="/2015/01/26/linux vps搭建vpn/"  title="Linux Vps 搭建Vpn">
+ <strong>NEXT:</strong><br/> 
+ <span>Linux Vps 搭建Vpn
+</span>
+</a>
+</div>
+
+</nav>
+
+	
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">文章目录</strong>
+  
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="隐藏侧边栏"></a></div>
+<aside class="clearfix">
+
+
+
+</aside>
+</div>
+
+    </div>
+    <footer><div id="footer" >
+	
+	
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+	</div>
+		<p class="copyright">Copyright © 2015
+		
+		snailgoers
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else
+    {
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina');
+  var html = [
+  '<a href="#" class="overlay" id="qrcode"></a>',
+  '<div class="qrcode clearfix"><span>扫描二维码分享到微信朋友圈</span><a class="qrclose" href="#share"></a><strong>Loading...Please wait</strong><img id="qrcode-pic" data-src="http://s.jiathis.com/qrcode.php?url=' + encodedUrl + '"/></div>',
+  '<a href="#textlogo" class="article-back-to-top" title="Top"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="QRcode"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="Weibo"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+  $('.article-share-qrcode').click(function(){
+    var imgSrc = $('#qrcode-pic').attr('data-src');
+    $('#qrcode-pic').attr('src', imgSrc);
+    $('#qrcode-pic').load(function(){
+        $('.qrcode strong').text(' ');
+    });
+  });
+});     
+</script>
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+  </body>
+</html>
+
