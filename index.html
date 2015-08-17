@@ -54,14 +54,44 @@
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/08/14/“打”城管技术指南/" title="" itemprop="url">
+    <a href="/2015/08/17/C#调用C++dll堆栈不对称错误/" title="C# 调用c++ dll file _cdecl(/GD) _stdcal(/GZ)" itemprop="url">
   
-    <h1 itemprop="name"></h1>
+    <h1 itemprop="name">C# 调用c++ dll file _cdecl(/GD) _stdcal(/GZ)</h1>
     
      
-           <p itemprop="description" >title: “打”城管技术指南date: 2014-5-6 17:10:51categories: 生活
-tags: 生活转载
-最近有三起轰动的城管被打事件，每一次都将城管暴力推上舆论尖锋，接受公众审判。其中最轰动的一次是苍南城管被围殴，最血腥的则是“五一”期间南京城管被摊贩“</p>
+           <p itemprop="description" >在调用dll文件时，由于采用了不同的堆栈方式， 可能出现堆栈不对称的错误，此时，应该检查vs设置里面 c/c++ -&amp;gt; Advanced -&amp;gt; calling Conversion, c++ solution and the c# solution should be</p>
+        
+    
+    <time datetime="2015-08-17T02:09:04.000Z" itemprop="datePublished">Aug 17 2015</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2015/08/17/Object C 调用标准c:c++代码/" title="Object c 调用标准C/C++代码" itemprop="url">
+  
+    <h1 itemprop="name">Object c 调用标准C/C++代码</h1>
+    
+     
+           <p itemprop="description" >因项目需求，需要在mac平台下开发程序， 其中引用了标准c/c++代码，涉及混合编程， 其实很简单， 只需要在工程中添加.mm文件及.h文件即可，.mm文件就是我们常见的.cpp文件，包含所有的头文件及实现函数，但是出口函数前面要添加
+extern &quot;C&quot;
+void Functi</p>
+        
+    
+    <time datetime="2015-08-17T02:05:22.000Z" itemprop="datePublished">Aug 17 2015</time>
+  </a>
+</section>
+
+  <section class="post" itemscope itemprop="blogPost">
+  
+    <a href="/2015/08/14/矩阵的旋转平移正变换及反变换/" title="矩阵的旋转平移正变换及反变换" itemprop="url">
+  
+    <h1 itemprop="name">矩阵的旋转平移正变换及反变换</h1>
+    
+     
+           <p itemprop="description" >假设一个点P(x,y,z)，旋转矩阵T，平移向量V，则旋转后的平移表达式为T*P+V,此处采用右乘准则，用矩阵表示为：
+[T V;0 1]*[T0 V0;0 1]=[T*T0 T*V0+V;0 1]
+其中T0为P原始坐标系的旋转矩阵，V0是P原始坐标系的评议向量，则相应的逆变换为</p>
         
     
     <time datetime="2015-08-14T13:48:55.000Z" itemprop="datePublished">Aug 14 2015</time>
@@ -85,14 +115,14 @@ Let the </p>
 
   <section class="post" itemscope itemprop="blogPost">
   
-    <a href="/2015/08/14/矩阵的旋转平移正变换及反变换/" title="矩阵的旋转平移正变换及反变换" itemprop="url">
+    <a href="/2015/08/14/“打”城管技术指南/" title="" itemprop="url">
   
-    <h1 itemprop="name">矩阵的旋转平移正变换及反变换</h1>
+    <h1 itemprop="name"></h1>
     
      
-           <p itemprop="description" >假设一个点P(x,y,z)，旋转矩阵T，平移向量V，则旋转后的平移表达式为T*P+V,此处采用右乘准则，用矩阵表示为：
-[T V;0 1]*[T0 V0;0 1]=[T*T0 T*V0+V;0 1]
-其中T0为P原始坐标系的旋转矩阵，V0是P原始坐标系的评议向量，则相应的逆变换为</p>
+           <p itemprop="description" >title: “打”城管技术指南date: 2014-5-6 17:10:51categories: 生活
+tags: 生活转载
+最近有三起轰动的城管被打事件，每一次都将城管暴力推上舆论尖锋，接受公众审判。其中最轰动的一次是苍南城管被围殴，最血腥的则是“五一”期间南京城管被摊贩“</p>
         
     
     <time datetime="2015-08-14T13:48:55.000Z" itemprop="datePublished">Aug 14 2015</time>
@@ -168,43 +198,6 @@ warning C4819: The file contains a character that cannot be represented in the c
         
     
     <time datetime="2015-01-20T02:40:29.000Z" itemprop="datePublished">Jan 20 2015</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/01/14/点云看空间曲线的微分信息计算方法/" title="Frenet标架及曲率挠率计算" itemprop="url">
-  
-    <h1 itemprop="name">Frenet标架及曲率挠率计算</h1>
-    
-     
-           <p itemprop="description" >此文算法基于马国庆等论文“点云空间曲线的微分信息计算及匹配方法”，引用请注明出处，在此感谢
-###Code
-function [curveture,fT,fN,fB]=Frenet_Curveture(pt,k)
-%计算连续曲线点的frenet标架及点的曲率
-%参考：点云空间曲线</p>
-        
-    
-    <time datetime="2015-01-14T08:38:41.000Z" itemprop="datePublished">Jan 14 2015</time>
-  </a>
-</section>
-
-  <section class="post" itemscope itemprop="blogPost">
-  
-    <a href="/2015/01/14/开轮廓轮廓跟踪/" title="开轮廓轮轮廓跟踪" itemprop="url">
-  
-    <h1 itemprop="name">开轮廓轮轮廓跟踪</h1>
-    
-     
-           <p itemprop="description" >function out = OpenBoundaryTrack(bw)
-% 单个边缘跟踪，pstart为联通区右下方的像素点 当边缘位于边界处，无法跟踪，需将
-% 图像人为扩大2*2像素并置0，并将最后结果做边界处理
-
-bw1=zeros(size(bw)+2);
-bw1(2:</p>
-        
-    
-    <time datetime="2015-01-14T08:36:01.000Z" itemprop="datePublished">Jan 14 2015</time>
   </a>
 </section>
 

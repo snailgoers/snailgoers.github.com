@@ -4,12 +4,15 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>pca确定图像主方向 | Opengcl</title>
+    <title>Object c 调用标准C/C++代码 | Opengcl</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
     
     <meta name="author" content="snailgoers">
     
-    <meta name="description" content="继上篇所言，图像匹配设计旋转平移缩放，图像旋转是图像配准中较难的一个环节，继上节利用最小面积外接矩形求旋转方向后，再利用pca方法求图像主方向的方法求图像旋转角度。对于一个样本点pt=[x,y]’,现有点集PT={pt1,pt2,…ptk},其均值为me=(pt1+pt2+…+ptk)/k,协方差矩">
+    <meta name="description" content="因项目需求，需要在mac平台下开发程序， 其中引用了标准c/c++代码，涉及混合编程， 其实很简单， 只需要在工程中添加.mm文件及.h文件即可，.mm文件就是我们常见的.cpp文件，包含所有的头文件及实现函数，但是出口函数前面要添加
+extern &quot;C&quot;
+void Function()
+而头文件里">
     
     
     <meta name="keywords" content="算法,设计,学习,分享,图像处理,计算几何,通用计算库,视频处理,人工智能,大数据处理,智能家居">
@@ -55,11 +58,11 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2015/04/22/PCA图像主方向/" title="pca确定图像主方向" itemprop="url">pca确定图像主方向</a>
+      <a href="/2015/08/17/Object C 调用标准c:c++代码/" title="Object c 调用标准C/C++代码" itemprop="url">Object c 调用标准C/C++代码</a>
   </h1>
 
   <p class="article-time">
-    <time datetime="2015-04-22T08:33:23.000Z" itemprop="datePublished">Apr 22 2015</time>
+    <time datetime="2015-08-17T02:05:22.000Z" itemprop="datePublished">Aug 17 2015</time>
   </p>
 </header>
 
@@ -71,48 +74,23 @@
 		
 		</div>
 		
-		<p>继<a href="http://opengcl.com/2015/04/22/%E5%9B%BE%E5%83%8F%E5%8C%B9%E9%85%8D%E4%B9%8B%E6%9C%80%E5%B0%8F%E9%9D%A2%E7%A7%AF%E5%A4%96%E6%8E%A5%E7%9F%A9%E5%BD%A2/" target="_blank" rel="external">上篇</a>所言，图像匹配设计旋转平移缩放，图像旋转是图像配准中较难的一个环节，继上节利用最小面积外接矩形求旋转方向后，再利用pca方法求图像主方向的方法求图像旋转角度。<br>对于一个样本点pt=[x,y]’,现有点集PT={pt1,pt2,…ptk},其均值为me=(pt1+pt2+…+ptk)/k,协方差矩阵为segma={(pt1-me)<em>(pt1-me)’+…+(ptk-me)</em>(ptk-me)};对segma进行特征分解，按照从大到小排列，有特征向量V， 其每一行对应一个特征向量，解方程<br>V*T=[1 0]’,向量T经过V的投影之后，在主方向上投影为1，在垂直方向上投影为0，故T既指明了主方向。</p>
-<p>###code</p>
-<pre><code><span class="function"><span class="keyword">void</span> <span class="title">PcaDirection</span><span class="params">(<span class="built_in">vector</span>&lt;GCLPOINT &gt; pt, <span class="keyword">double</span> &amp;degree)</span>
-</span>{
-    <span class="keyword">int</span> len = <span class="keyword">int</span>(pt.size());
-    <span class="keyword">double</span> *A = <span class="keyword">new</span> <span class="keyword">double</span>[<span class="number">4</span>];
-    <span class="built_in">memset</span>(A, <span class="number">0</span>, <span class="keyword">sizeof</span>(<span class="keyword">double</span>) * <span class="number">4</span>);
-    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; len; i++)
-    {
-        A[<span class="number">0</span>] += pt[i].x * pt[i].x;
-        A[<span class="number">1</span>] += pt[i].x * pt[i].y;
-        A[<span class="number">3</span>] += pt[i].y * pt[i].y;
-    }
-    A[<span class="number">0</span>] /= len;
-    A[<span class="number">1</span>] /= len;
-    A[<span class="number">2</span>] = A[<span class="number">1</span>];
-    A[<span class="number">3</span>] /= len;
-
-    <span class="comment">// calculate the eigenvalue</span>
-    <span class="keyword">double</span> vec[<span class="number">4</span>];
-    <span class="keyword">double</span> eigValue[<span class="number">2</span>];
-    Jacobi(A, <span class="number">2</span>, eigValue, vec, <span class="number">10000</span>, <span class="number">10e-7</span>);
-    <span class="keyword">double</span> inVec[<span class="number">4</span>];
-    MatrixInverse(vec, inVec, <span class="number">2</span>);
-    degree = -<span class="built_in">atan2</span>(inVec[<span class="number">2</span>], inVec[<span class="number">0</span>]) * <span class="number">180</span> / PI;
-
-    <span class="keyword">delete</span>[] A;
-}
-</code></pre><p>其中，jacobi求特征值及特征向量的方法<a href="http://opengcl.com/2015/01/20/jacobi%E6%B1%82%E8%A7%A3%E7%89%B9%E5%BE%81%E5%80%BC%E5%8F%8A%E7%89%B9%E5%BE%81%E5%90%91%E9%87%8F/" target="_blank" rel="external">参见jacobi求特征值</a>。</p>
+		<p>因项目需求，需要在mac平台下开发程序， 其中引用了标准c/c++代码，涉及混合编程， 其实很简单， 只需要在工程中添加.mm文件及.h文件即可，.mm文件就是我们常见的.cpp文件，包含所有的头文件及实现函数，但是出口函数前面要添加</p>
+<pre><code><span class="keyword">extern</span> <span class="string">"C"</span>
+void <span class="function"><span class="keyword">Function</span>(</span>)
+</code></pre><p>而头文件里面， 只有函数的声明， 同时将.cpp文件修改为.mm文件， xcode编译器选项选择为自动根据文件选择编译器即可</p>
   
 	</div>
 		<footer class="article-footer clearfix">
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/pca/">pca</a><a href="/tags/图像主方向/">图像主方向</a><a href="/tags/图像匹配/">图像匹配</a>
+  <span></span> <a href="/tags/c-c/">c/c++</a><a href="/tags/object-c/">object c</a>
   </div>
 
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/算法/">算法</a>
+  <a class="article-category-link" href="/categories/实用/">实用</a>
 </div>
 
 
@@ -123,18 +101,18 @@
 <nav class="article-nav clearfix">
  
  <div class="prev" >
- <a href="/2015/08/14/“打”城管技术指南/" title="">
+ <a href="/2015/08/17/C#调用C++dll堆栈不对称错误/" title="C# 调用c++ dll file _cdecl(/GD) _stdcal(/GZ)">
   <strong>PREVIOUS:</strong><br/>
   <span>
-  (no title)</span>
+  C# 调用c++ dll file _cdecl(/GD) _stdcal(/GZ)</span>
 </a>
 </div>
 
 
 <div class="next">
-<a href="/2015/04/22/图像匹配之最小面积外接矩形/"  title="图像匹配之最小面积矩形">
+<a href="/2015/08/14/矩阵的旋转平移正变换及反变换/"  title="矩阵的旋转平移正变换及反变换">
  <strong>NEXT:</strong><br/> 
- <span>图像匹配之最小面积矩形
+ <span>矩阵的旋转平移正变换及反变换
 </span>
 </a>
 </div>
