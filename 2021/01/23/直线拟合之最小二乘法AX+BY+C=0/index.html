@@ -1,0 +1,243 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>直线拟合之最小二乘法AX+BY+C=0 | Opengcl</title><meta name="keywords" content="计算几何,算法"><meta name="author" content="snailgoers,snailgoers@hotmail.com"><meta name="copyright" content="snailgoers"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><meta name="description" content="最小二乘法拟合直线，对于大多数人都不是很陌生，直线方程 y&#x3D;kx+b，令sum((y-kx-b)^2)，分别对k和b求导便可求出最佳的参数，但是如果遇到诸如“X&#x3D;5”这样的直线方程，又该如何呢？这时候就不再适用了，参考这个方法，这样拟合出来的才是直线的一般方程。 Let the line sought be Ax + By + C &#x3D; 0, with no restriction on A, B,">
+<meta property="og:type" content="article">
+<meta property="og:title" content="直线拟合之最小二乘法AX+BY+C&#x3D;0">
+<meta property="og:url" content="http://yoursite.com/2021/01/23/%E7%9B%B4%E7%BA%BF%E6%8B%9F%E5%90%88%E4%B9%8B%E6%9C%80%E5%B0%8F%E4%BA%8C%E4%B9%98%E6%B3%95AX+BY+C=0/index.html">
+<meta property="og:site_name" content="Opengcl">
+<meta property="og:description" content="最小二乘法拟合直线，对于大多数人都不是很陌生，直线方程 y&#x3D;kx+b，令sum((y-kx-b)^2)，分别对k和b求导便可求出最佳的参数，但是如果遇到诸如“X&#x3D;5”这样的直线方程，又该如何呢？这时候就不再适用了，参考这个方法，这样拟合出来的才是直线的一般方程。 Let the line sought be Ax + By + C &#x3D; 0, with no restriction on A, B,">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/img/1.jpg">
+<meta property="article:published_time" content="2021-01-23T12:49:51.319Z">
+<meta property="article:modified_time" content="2015-02-02T19:18:22.000Z">
+<meta property="article:author" content="snailgoers">
+<meta property="article:tag" content="计算几何">
+<meta property="article:tag" content="算法">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/img/1.jpg"><link rel="shortcut icon" href="/img/gclvision.png"><link rel="canonical" href="http://yoursite.com/2021/01/23/%E7%9B%B4%E7%BA%BF%E6%8B%9F%E5%90%88%E4%B9%8B%E6%9C%80%E5%B0%8F%E4%BA%8C%E4%B9%98%E6%B3%95AX+BY+C=0/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+};
+
+var saveToLocal = {
+  set: function setWithExpiry(key, value, ttl) {
+    const now = new Date()
+    const expiryDay = ttl * 86400000
+    const item = {
+      value: value,
+      expiry: now.getTime() + expiryDay,
+    }
+    localStorage.setItem(key, JSON.stringify(item))
+  },
+
+  get: function getWithExpiry(key) {
+    const itemStr = localStorage.getItem(key)
+
+    if (!itemStr) {
+      return undefined
+    }
+    const item = JSON.parse(itemStr)
+    const now = new Date()
+
+    if (now.getTime() > item.expiry) {
+      localStorage.removeItem(key)
+      return undefined
+    }
+    return item.value
+  }
+}
+
+// https://stackoverflow.com/questions/16839698/jquery-getscript-alternative-in-native-javascript
+const getScript = url => new Promise((resolve, reject) => {
+  const script = document.createElement('script')
+  script.src = url
+  script.async = true
+  script.onerror = reject
+  script.onload = script.onreadystatechange = function() {
+    const loadState = this.readyState
+    if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+    script.onload = script.onreadystatechange = null
+    resolve()
+  }
+  document.head.appendChild(script)
+})</script><script id="config_change">var GLOBAL_CONFIG_SITE = { 
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2月 3 2015 3:18:22'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(function () {  window.activateDarkMode = function () {
+    document.documentElement.setAttribute('data-theme', 'dark')
+    if (document.querySelector('meta[name="theme-color"]') !== null) {
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+    }
+  }
+  window.activateLightMode = function () {
+    document.documentElement.setAttribute('data-theme', 'light')
+   if (document.querySelector('meta[name="theme-color"]') !== null) {
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+    }
+  }
+  const autoChangeMode = 'false'
+  const t = saveToLocal.get('theme')
+  if (autoChangeMode === '1') {
+    const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+    const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+    const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+    if (t === undefined) {
+      if (isLightMode) activateLightMode()
+      else if (isDarkMode) activateDarkMode()
+      else if (isNotSpecified || hasNoSupport) {
+        const now = new Date()
+        const hour = now.getHours()
+        const isNight = hour <= 6 || hour >= 18
+        isNight ? activateDarkMode() : activateLightMode()
+      }
+      window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+        if (saveToLocal.get('theme') === undefined) {
+          e.matches ? activateDarkMode() : activateLightMode()
+        }
+      })
+    } else if (t === 'light') activateLightMode()
+    else activateDarkMode()
+  } else if (autoChangeMode === '2') {
+    const now = new Date()
+    const hour = now.getHours()
+    const isNight = hour <= 6 || hour >= 18
+    if (t === undefined) isNight ? activateDarkMode() : activateLightMode()
+    else if (t === 'light') activateLightMode()
+    else activateDarkMode()
+  } else {
+    if (t === 'dark') activateDarkMode()
+    else if (t === 'light') activateLightMode()
+  }const asideStatus = saveToLocal.get('aside-status')
+if (asideStatus !== undefined) {
+   if (asideStatus === 'hide') {
+     document.documentElement.classList.add('hide-aside')
+   } else {
+     document.documentElement.classList.remove('hide-aside')
+   }
+}})()</script><meta name="generator" content="Hexo 5.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" src="/img/KikiTop.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">50</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">48</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/1.jpg)"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">Opengcl</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">直线拟合之最小二乘法AX+BY+C=0</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-01-23T12:49:51.319Z" title="发表于 1月 23 2021 20:49:51">1月 23 2021</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2015-02-02T19:18:22.000Z" title="更新于 2月 3 2015 3:18:22">2月 3 2015</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E7%AE%97%E6%B3%95/">算法</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span><span class="post-meta-separator">|</span><span class="post-meta-commentcount"><i class="far fa-comments fa-fw post-meta-icon"></i><span class="post-meta-label">评论数:</span><a href="/2021/01/23/%E7%9B%B4%E7%BA%BF%E6%8B%9F%E5%90%88%E4%B9%8B%E6%9C%80%E5%B0%8F%E4%BA%8C%E4%B9%98%E6%B3%95AX+BY+C=0/#post-comment" itemprop="discussionUrl"><span class="valine-comment-count" data-xid="/2021/01/23/%E7%9B%B4%E7%BA%BF%E6%8B%9F%E5%90%88%E4%B9%8B%E6%9C%80%E5%B0%8F%E4%BA%8C%E4%B9%98%E6%B3%95AX+BY+C=0/" itemprop="commentCount"></span></a></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>最小二乘法拟合直线，对于大多数人都不是很陌生，直线方程 y=kx+b，令sum((y-kx-b)^2)，分别对k和b求导便可求出最佳的参数，但是如果遇到诸如“X=5”这样的直线方程，又该如何呢？这时候就不再适用了，<a target="_blank" rel="noopener" href="http://mathforum.org/library/drmath/view/51809.html">参考</a>这个方法，这样拟合出来的才是直线的一般方程。</p>
+<p>Let the line sought be A<em>x + B</em>y + C = 0, with no restriction on A, B,<br>and C, except not both of A and B are zero. Then the distance from a<br>point (x[n],y[n]) to this line is given by</p>
+<pre><code>d[n] = |A*x[n]+B*y[n]+C|/sqrt(A^2+B^2).</code></pre>
+<p>Then the sum of the squares of the distances of the r points from the<br>line is</p>
+<pre><code>F(A,B,C) = SUM d[n]^2
+         = SUM (A*x[n]+B*y[n]+C)^2/(A^2+B^2).</code></pre>
+<p>Here and henceforth, the sums run over the range 1 &lt;= n &lt;= r.</p>
+<p>Now take the partial derivatives of F with respect to A, B, and C, and<br>set them equal to zero. This will give you a set of three simultaneous<br>nonlinear equations in A, B, and C, and you need to solve them. They<br>will be polynomial, of degree 3. When I did this, the equations turned<br>out to be</p>
+<a id="more"></a>
+<pre><code>   SUM (A*x[n]+B*y[n]+C)*(A*C-B^2*x[n]+A*B*y[n]) = 0,
+   SUM (A*x[n]+B*y[n]+C)*(B*C+A*B*x[n]-A^2*y[n]) = 0,
+   SUM A*x[n]+B*y[n]+C = 0.</code></pre>
+<p>These can be rewritten as polynomials in A, B, and C with coefficients<br>involving</p>
+<pre><code>   r = SUM 1,
+   s = SUM x[n],
+   t = SUM y[n],
+   u = SUM x[n]^2,
+   v = SUM x[n]*y[n],
+   w = SUM y[n]^2,</code></pre>
+<p>which are quantities you can compute from your data points.</p>
+<pre><code>   -v*A^2*B-s*A^2*C+(u-w)*A*B^2-2*t*A*B*C-r*A*C^2+v*B^3+s*B^2*C = 0,
+   v*A^3+(w-u)*A^2*B+t*A^2*C-v*A*B^2-2*s*A*B*C-t*B^2*C-r*B*C^2 = 0,
+   s*A+t*B+r*C = 0.</code></pre>
+<p>C can be eliminated using the last equation, which is the same as</p>
+<pre><code>       C = -(s*A+t*B)/r.</code></pre>
+<p>That will leave you with two cubic equations in two unknowns A and B. </p>
+<p>They turn out to be equivalent to the single quadratic equation</p>
+<pre><code>   (r*v-s*t)*A^2 + (s^2-t^2-r*u+r*w)*A*B - (r*v-s*t)*B^2 = 0.
+   A^2 + [(s^2-t^2-r*u+r*w)/(r*v-s*t)]*A*B - B^2 = 0.</code></pre>
+<p>Now unless r<em>v - s</em>t = 0, you can solve this equation for -A/B, the<br>slope of the line. Then you can find C/B, too, and thus the equation<br>of the line. You will get two distinct solutions. One is the minimum<br>you seek, and the other is a saddle point of F(A,B,C). You can tell<br>which is the minimum by evaluating F(A,B,C) at each one and choosing<br>the solution that gives you the smaller value.</p>
+<p>If r<em>v = s</em>t, but the coefficient s^2-t^2-r<em>u+r</em>w is nonzero, then the<br>minimum will be achieved for either A = 0 or B = 0. Figure out C for<br>both of these possibilities, and substitute them into F(A,B,C). The<br>one that gives you the lesser value is your solution.</p>
+<p>If r<em>v = s</em>t and s^2-t^2-r<em>u+r</em>w = 0, then any line through the center<br>of mass (s/r,t/r) will give the same value of F as any other, and all<br>are tied for being the best.</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:snailgoers@hotmail.com">snailgoers</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://yoursite.com/2021/01/23/%E7%9B%B4%E7%BA%BF%E6%8B%9F%E5%90%88%E4%B9%8B%E6%9C%80%E5%B0%8F%E4%BA%8C%E4%B9%98%E6%B3%95AX+BY+C=0/">http://yoursite.com/2021/01/23/%E7%9B%B4%E7%BA%BF%E6%8B%9F%E5%90%88%E4%B9%8B%E6%9C%80%E5%B0%8F%E4%BA%8C%E4%B9%98%E6%B3%95AX+BY+C=0/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://yoursite.com" target="_blank">Opengcl</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E8%AE%A1%E7%AE%97%E5%87%A0%E4%BD%95/">计算几何</a><a class="post-meta__tags" href="/tags/%E7%AE%97%E6%B3%95/">算法</a></div><div class="post_share"><div class="social-share" data-image="/img/1.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><div class="post-reward"><div class="reward-button"><i class="fas fa-qrcode"></i> 打赏<div class="reward-main"><ul class="reward-all"><li class="reward-item"><a href="/img/weixinJYL.jpg" target="_blank"><img class="post-qr-code-img" src="/img/weixinJYL.jpg" alt="微信"/></a><div class="post-qr-code-desc">微信</div></li></ul></div></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2021/01/23/%E7%9F%A9%E9%98%B5%E7%9A%84%E6%97%8B%E8%BD%AC%E5%B9%B3%E7%A7%BB%E6%AD%A3%E5%8F%98%E6%8D%A2%E5%8F%8A%E5%8F%8D%E5%8F%98%E6%8D%A2/"><img class="prev-cover" src="/img/1.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">矩阵的旋转平移正变换及反变换</div></div></a></div><div class="next-post pull-right"><a href="/2021/01/23/Object%20C%20%E8%B0%83%E7%94%A8%E6%A0%87%E5%87%86c%EF%80%A2c++%E4%BB%A3%E7%A0%81/"><img class="next-cover" src="/img/1.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Object c 调用标准C/C++代码</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span> 相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2014/04/25/关于直线镜像矩阵生成/" title="关于直线镜像矩阵生成"><img class="cover" src="/img/1.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 4月 25 2014</div><div class="title">关于直线镜像矩阵生成</div></div></a></div><div><a href="/2014/05/15/点到斜椭圆最小距离/" title="任意点到斜椭圆最小距离"><img class="cover" src="/img/1.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 5月 15 2014</div><div class="title">任意点到斜椭圆最小距离</div></div></a></div><div><a href="/2021/01/23/矩阵的旋转平移正变换及反变换/" title="矩阵的旋转平移正变换及反变换"><img class="cover" src="/img/1.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 1月 23 2021</div><div class="title">矩阵的旋转平移正变换及反变换</div></div></a></div><div><a href="/2014/08/27/Delaunay三角剖分/" title="Delaunay三角剖分"><img class="cover" src="/img/1.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 8月 27 2014</div><div class="title">Delaunay三角剖分</div></div></a></div><div><a href="/2015/01/14/只有旋转和平移的空间变换推导/" title="只有旋转和平移的变换矩阵推导"><img class="cover" src="/img/1.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 1月 14 2015</div><div class="title">只有旋转和平移的变换矩阵推导</div></div></a></div><div><a href="/2014/08/15/根据旋转前后向量确定旋转矩阵/" title="根据旋转前后向量求旋转矩阵"><img class="cover" src="/img/1.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 8月 15 2014</div><div class="title">根据旋转前后向量求旋转矩阵</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-info-avatar is-center"><img class="avatar-img" src="/img/KikiTop.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/><div class="author-info__name">snailgoers</div><div class="author-info__description">算法,设计,学习,分享,数字图像处理,视频处理,人工智能,模式识别,大数据处理,计算几何,通用计算库,智能家居</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">50</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">标签</div><div class="length-num">48</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div></div><a class="button--animated" id="card-info-btn" href="mailto:snailgoers@hotmail.com || Email"><i class="fas fa-envelope"></i><span>发邮件给我</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/snailgoers" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:snailgoers@hotmail.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>公告</span></div><div class="announcement_content">欢迎来到我的博客</div></div><div class="sticky_layout"></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2015 - 2021 By snailgoers</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    let initData = {
+      el: '#vcomment',
+      appId: 'F7XGoBqPQUD3luHnycSrn2rV-MdYXbMMI',
+      appKey: 'O4YxlEinRq7uUHlLtmEtzCaP',
+      placeholder: 'Please leave your footprints',
+      avatar: 'monsterid',
+      meta: 'nick,mail,link'.split(','),
+      pageSize: '10',
+      lang: 'zh-CN',
+      recordIP: false,
+      serverURLs: '',
+      emojiCDN: '',
+      emojiMaps: "",
+      enableQQ: false,
+      path: window.location.pathname,
+    }
+
+    if (true) { 
+      initData.requiredFields= ('nick,mail'.split(','))
+    }
+    
+    if (false) {
+      const otherData = false
+      initData = Object.assign(initData, otherData)
+    }
+    
+    const valine = new Valine(initData)
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
+
+if ('Valine' === 'Valine' || !false) {
+  if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></div></body></html>

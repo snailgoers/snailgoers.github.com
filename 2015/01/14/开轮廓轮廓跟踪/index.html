@@ -1,0 +1,284 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>开轮廓轮轮廓跟踪 | Opengcl</title><meta name="keywords" content="轮廓跟踪"><meta name="author" content="snailgoers,snailgoers@hotmail.com"><meta name="copyright" content="snailgoers"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><meta name="description" content="function out &#x3D; OpenBoundaryTrack(bw) % 单个边缘跟踪，pstart为联通区右下方的像素点 当边缘位于边界处，无法跟踪，需将 % 图像人为扩大2*2像素并置0，并将最后结果做边界处理  bw1&#x3D;zeros(size(bw)+2); bw1(2:end-1,2:end-1)&#x3D;bw; ba&#x3D;BoundaryTrack(bw1); [row,col]&#x3D;size(bw)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="开轮廓轮轮廓跟踪">
+<meta property="og:url" content="http://yoursite.com/2015/01/14/%E5%BC%80%E8%BD%AE%E5%BB%93%E8%BD%AE%E5%BB%93%E8%B7%9F%E8%B8%AA/index.html">
+<meta property="og:site_name" content="Opengcl">
+<meta property="og:description" content="function out &#x3D; OpenBoundaryTrack(bw) % 单个边缘跟踪，pstart为联通区右下方的像素点 当边缘位于边界处，无法跟踪，需将 % 图像人为扩大2*2像素并置0，并将最后结果做边界处理  bw1&#x3D;zeros(size(bw)+2); bw1(2:end-1,2:end-1)&#x3D;bw; ba&#x3D;BoundaryTrack(bw1); [row,col]&#x3D;size(bw)">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://yoursite.com/img/1.jpg">
+<meta property="article:published_time" content="2015-01-14T08:36:01.000Z">
+<meta property="article:modified_time" content="2015-02-02T19:18:40.000Z">
+<meta property="article:author" content="snailgoers">
+<meta property="article:tag" content="轮廓跟踪">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/img/1.jpg"><link rel="shortcut icon" href="/img/gclvision.png"><link rel="canonical" href="http://yoursite.com/2015/01/14/%E5%BC%80%E8%BD%AE%E5%BB%93%E8%BD%AE%E5%BB%93%E8%B7%9F%E8%B8%AA/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+};
+
+var saveToLocal = {
+  set: function setWithExpiry(key, value, ttl) {
+    const now = new Date()
+    const expiryDay = ttl * 86400000
+    const item = {
+      value: value,
+      expiry: now.getTime() + expiryDay,
+    }
+    localStorage.setItem(key, JSON.stringify(item))
+  },
+
+  get: function getWithExpiry(key) {
+    const itemStr = localStorage.getItem(key)
+
+    if (!itemStr) {
+      return undefined
+    }
+    const item = JSON.parse(itemStr)
+    const now = new Date()
+
+    if (now.getTime() > item.expiry) {
+      localStorage.removeItem(key)
+      return undefined
+    }
+    return item.value
+  }
+}
+
+// https://stackoverflow.com/questions/16839698/jquery-getscript-alternative-in-native-javascript
+const getScript = url => new Promise((resolve, reject) => {
+  const script = document.createElement('script')
+  script.src = url
+  script.async = true
+  script.onerror = reject
+  script.onload = script.onreadystatechange = function() {
+    const loadState = this.readyState
+    if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+    script.onload = script.onreadystatechange = null
+    resolve()
+  }
+  document.head.appendChild(script)
+})</script><script id="config_change">var GLOBAL_CONFIG_SITE = { 
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2月 3 2015 3:18:40'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(function () {  window.activateDarkMode = function () {
+    document.documentElement.setAttribute('data-theme', 'dark')
+    if (document.querySelector('meta[name="theme-color"]') !== null) {
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+    }
+  }
+  window.activateLightMode = function () {
+    document.documentElement.setAttribute('data-theme', 'light')
+   if (document.querySelector('meta[name="theme-color"]') !== null) {
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+    }
+  }
+  const autoChangeMode = 'false'
+  const t = saveToLocal.get('theme')
+  if (autoChangeMode === '1') {
+    const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const isLightMode = window.matchMedia('(prefers-color-scheme: light)').matches
+    const isNotSpecified = window.matchMedia('(prefers-color-scheme: no-preference)').matches
+    const hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+    if (t === undefined) {
+      if (isLightMode) activateLightMode()
+      else if (isDarkMode) activateDarkMode()
+      else if (isNotSpecified || hasNoSupport) {
+        const now = new Date()
+        const hour = now.getHours()
+        const isNight = hour <= 6 || hour >= 18
+        isNight ? activateDarkMode() : activateLightMode()
+      }
+      window.matchMedia('(prefers-color-scheme: dark)').addListener(function (e) {
+        if (saveToLocal.get('theme') === undefined) {
+          e.matches ? activateDarkMode() : activateLightMode()
+        }
+      })
+    } else if (t === 'light') activateLightMode()
+    else activateDarkMode()
+  } else if (autoChangeMode === '2') {
+    const now = new Date()
+    const hour = now.getHours()
+    const isNight = hour <= 6 || hour >= 18
+    if (t === undefined) isNight ? activateDarkMode() : activateLightMode()
+    else if (t === 'light') activateLightMode()
+    else activateDarkMode()
+  } else {
+    if (t === 'dark') activateDarkMode()
+    else if (t === 'light') activateLightMode()
+  }const asideStatus = saveToLocal.get('aside-status')
+if (asideStatus !== undefined) {
+   if (asideStatus === 'hide') {
+     document.documentElement.classList.add('hide-aside')
+   } else {
+     document.documentElement.classList.remove('hide-aside')
+   }
+}})()</script><meta name="generator" content="Hexo 5.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="author-avatar"><img class="avatar-img" src="/img/KikiTop.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">50</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">48</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/1.jpg)"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">Opengcl</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">开轮廓轮轮廓跟踪</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2015-01-14T08:36:01.000Z" title="发表于 1月 14 2015 16:36:01">1月 14 2015</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2015-02-02T19:18:40.000Z" title="更新于 2月 3 2015 3:18:40">2月 3 2015</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%9B%BE%E5%83%8F%E5%A4%84%E7%90%86/">图像处理</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span><span class="post-meta-separator">|</span><span class="post-meta-commentcount"><i class="far fa-comments fa-fw post-meta-icon"></i><span class="post-meta-label">评论数:</span><a href="/2015/01/14/%E5%BC%80%E8%BD%AE%E5%BB%93%E8%BD%AE%E5%BB%93%E8%B7%9F%E8%B8%AA/#post-comment" itemprop="discussionUrl"><span class="valine-comment-count" data-xid="/2015/01/14/%E5%BC%80%E8%BD%AE%E5%BB%93%E8%BD%AE%E5%BB%93%E8%B7%9F%E8%B8%AA/" itemprop="commentCount"></span></a></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><pre><code>function out = OpenBoundaryTrack(bw)
+% 单个边缘跟踪，pstart为联通区右下方的像素点 当边缘位于边界处，无法跟踪，需将
+% 图像人为扩大2*2像素并置0，并将最后结果做边界处理
+
+bw1=zeros(size(bw)+2);
+bw1(2:end-1,2:end-1)=bw;
+ba=BoundaryTrack(bw1);
+[row,col]=size(bw);
+ba=ba-1;
+ba(find(ba(:,1)==1 | ba(:,1) == col | ba(:,2)== 1 | ba(:,2)== row),:)=[];
+% 寻找最大距离为开始点
+[~,dex]=max(sum((ba(1:end-1,:)-ba(2:end,:)).^2,2));
+out=[ba(dex+1:end,:);ba(1:dex,:)];
+
+
+function pt =BoundaryTrack(bw,pstart,pend)
+% 单个边缘跟踪，pstart为联通区右下方的像素点 当边缘位于边界处，无法跟踪，需将
+% 图像人为扩大2*2像素并置0，并将最后结果做边界处理
+[row, col]= size(bw);
+if ~exist(&#39;pstart&#39;,&#39;var&#39;)
+    for i=1:row
+        for j=1:col
+            if bw(i,j)~=0
+                pstart.y = i;
+                pstart.x = j;
+            end
+        end
+    end
+end
+if ~exist(&#39;pend&#39;,&#39;var&#39;)
+    pend=pstart;
+end
+
+%%
+k=0;
+flag = 1;
+ptcurrent = pstart;
+off=[1 0; 1 1; 0 1; -1 1; -1 0; -1 -1; 0 -1; 1 -1];
+
+pt=[pstart.x pstart.y];
+while flag
+flag = 0;   
+for i =1:8
+    k=bitand(k,7);
+    x = ptcurrent.x + off(k+1,1);
+    y = ptcurrent.y + off(k+1,2);
+
+    if x&gt;=1 &amp;&amp; x &lt;=col &amp;&amp; y&gt;=1 &amp;&amp; y &lt;=row
+        if bw(y,x)
+            for j = 1:2:8
+                ptemp.x = x + off(j,1);
+                ptemp.y = y + off(j,2);
+                if ptemp.x &gt;=1 &amp;&amp; ptemp.x &lt;=col &amp;&amp; ptemp.y &gt;=1 &amp;&amp; ptemp.y &lt;=row
+                    if bw(ptemp.y, ptemp.x) == 0
+                        flag = 1;
+                        ptcurrent.x = x;
+                        ptcurrent.y = y;
+                        pt=[pt;x y];
+                        break;
+                    end
+                end
+            end
+        end
+    end
+    if flag
+        if pend.x == ptcurrent.x &amp;&amp; pend.y == ptcurrent.y 
+            flag = 0;
+        end
+        break;
+    end
+    k = k +1;
+end
+k = k + 6;
+end</code></pre>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:snailgoers@hotmail.com">snailgoers</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://yoursite.com/2015/01/14/%E5%BC%80%E8%BD%AE%E5%BB%93%E8%BD%AE%E5%BB%93%E8%B7%9F%E8%B8%AA/">http://yoursite.com/2015/01/14/%E5%BC%80%E8%BD%AE%E5%BB%93%E8%BD%AE%E5%BB%93%E8%B7%9F%E8%B8%AA/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://yoursite.com" target="_blank">Opengcl</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E8%BD%AE%E5%BB%93%E8%B7%9F%E8%B8%AA/">轮廓跟踪</a></div><div class="post_share"><div class="social-share" data-image="/img/1.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><div class="post-reward"><div class="reward-button"><i class="fas fa-qrcode"></i> 打赏<div class="reward-main"><ul class="reward-all"><li class="reward-item"><a href="/img/weixinJYL.jpg" target="_blank"><img class="post-qr-code-img" src="/img/weixinJYL.jpg" alt="微信"/></a><div class="post-qr-code-desc">微信</div></li></ul></div></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2015/01/14/%E7%82%B9%E4%BA%91%E7%9C%8B%E7%A9%BA%E9%97%B4%E6%9B%B2%E7%BA%BF%E7%9A%84%E5%BE%AE%E5%88%86%E4%BF%A1%E6%81%AF%E8%AE%A1%E7%AE%97%E6%96%B9%E6%B3%95/"><img class="prev-cover" src="/img/1.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">Frenet标架及曲率挠率计算</div></div></a></div><div class="next-post pull-right"><a href="/2015/01/14/%E5%8F%AA%E6%9C%89%E6%97%8B%E8%BD%AC%E5%92%8C%E5%B9%B3%E7%A7%BB%E7%9A%84%E7%A9%BA%E9%97%B4%E5%8F%98%E6%8D%A2%E6%8E%A8%E5%AF%BC/"><img class="next-cover" src="/img/1.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">只有旋转和平移的变换矩阵推导</div></div></a></div></nav><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="card-info-avatar is-center"><img class="avatar-img" src="/img/KikiTop.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/><div class="author-info__name">snailgoers</div><div class="author-info__description">算法,设计,学习,分享,数字图像处理,视频处理,人工智能,模式识别,大数据处理,计算几何,通用计算库,智能家居</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">50</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">标签</div><div class="length-num">48</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">分类</div><div class="length-num">10</div></a></div></div><a class="button--animated" id="card-info-btn" href="mailto:snailgoers@hotmail.com || Email"><i class="fas fa-envelope"></i><span>发邮件给我</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/snailgoers" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:snailgoers@hotmail.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>公告</span></div><div class="announcement_content">欢迎来到我的博客</div></div><div class="sticky_layout"></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2015 - 2021 By snailgoers</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><div class="js-pjax"><script>function loadValine () {
+  function initValine () {
+    let initData = {
+      el: '#vcomment',
+      appId: 'F7XGoBqPQUD3luHnycSrn2rV-MdYXbMMI',
+      appKey: 'O4YxlEinRq7uUHlLtmEtzCaP',
+      placeholder: 'Please leave your footprints',
+      avatar: 'monsterid',
+      meta: 'nick,mail,link'.split(','),
+      pageSize: '10',
+      lang: 'zh-CN',
+      recordIP: false,
+      serverURLs: '',
+      emojiCDN: '',
+      emojiMaps: "",
+      enableQQ: false,
+      path: window.location.pathname,
+    }
+
+    if (true) { 
+      initData.requiredFields= ('nick,mail'.split(','))
+    }
+    
+    if (false) {
+      const otherData = false
+      initData = Object.assign(initData, otherData)
+    }
+    
+    const valine = new Valine(initData)
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
+
+if ('Valine' === 'Valine' || !false) {
+  if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></div></body></html>
