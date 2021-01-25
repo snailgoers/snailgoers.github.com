@@ -508,13 +508,6 @@
   </url>
   
   <url>
-    <loc>http://yoursite.com/tags/hough-%E7%9B%B4%E7%BA%BF%E6%A3%80%E6%B5%8B/</loc>
-    <lastmod>2021-01-25</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>http://yoursite.com/tags/eig/</loc>
     <lastmod>2021-01-25</lastmod>
     <changefreq>daily</changefreq>
@@ -558,6 +551,13 @@
   
   <url>
     <loc>http://yoursite.com/tags/java/</loc>
+    <lastmod>2021-01-25</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/tags/hough-%E7%9B%B4%E7%BA%BF%E6%A3%80%E6%B5%8B/</loc>
     <lastmod>2021-01-25</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -627,14 +627,14 @@
   </url>
   
   <url>
-    <loc>http://yoursite.com/tags/windows/</loc>
+    <loc>http://yoursite.com/tags/%E6%9C%80%E5%B0%8F%E4%BA%8C%E4%B9%98%E6%B3%95/</loc>
     <lastmod>2021-01-25</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>http://yoursite.com/tags/%E6%9C%80%E5%B0%8F%E4%BA%8C%E4%B9%98%E6%B3%95/</loc>
+    <loc>http://yoursite.com/tags/windows/</loc>
     <lastmod>2021-01-25</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -669,6 +669,13 @@
   </url>
   
   <url>
+    <loc>http://yoursite.com/tags/matlb/</loc>
+    <lastmod>2021-01-25</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/tags/%E5%9B%BE%E5%83%8F%E7%89%B9%E5%BE%81/</loc>
     <lastmod>2021-01-25</lastmod>
     <changefreq>daily</changefreq>
@@ -677,13 +684,6 @@
   
   <url>
     <loc>http://yoursite.com/tags/%E4%BA%BA%E8%84%B8%E6%A3%80%E6%B5%8B/</loc>
-    <lastmod>2021-01-25</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/tags/matlb/</loc>
     <lastmod>2021-01-25</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
