@@ -487,6 +487,13 @@
   </url>
   
   <url>
+    <loc>http://yoursite.com/tags/gclvision/</loc>
+    <lastmod>2021-01-25</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/tags/git/</loc>
     <lastmod>2021-01-25</lastmod>
     <changefreq>daily</changefreq>
@@ -495,13 +502,6 @@
   
   <url>
     <loc>http://yoursite.com/tags/github/</loc>
-    <lastmod>2021-01-25</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/tags/gclvision/</loc>
     <lastmod>2021-01-25</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -641,6 +641,13 @@
   </url>
   
   <url>
+    <loc>http://yoursite.com/tags/%E5%87%B8%E5%8C%85/</loc>
+    <lastmod>2021-01-25</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>http://yoursite.com/tags/C-C/</loc>
     <lastmod>2021-01-25</lastmod>
     <changefreq>daily</changefreq>
@@ -662,20 +669,6 @@
   </url>
   
   <url>
-    <loc>http://yoursite.com/tags/%E5%87%B8%E5%8C%85/</loc>
-    <lastmod>2021-01-25</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>http://yoursite.com/tags/matlb/</loc>
-    <lastmod>2021-01-25</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
     <loc>http://yoursite.com/tags/%E5%9B%BE%E5%83%8F%E7%89%B9%E5%BE%81/</loc>
     <lastmod>2021-01-25</lastmod>
     <changefreq>daily</changefreq>
@@ -684,6 +677,13 @@
   
   <url>
     <loc>http://yoursite.com/tags/%E4%BA%BA%E8%84%B8%E6%A3%80%E6%B5%8B/</loc>
+    <lastmod>2021-01-25</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>http://yoursite.com/tags/matlb/</loc>
     <lastmod>2021-01-25</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
@@ -776,14 +776,14 @@
   </url>
   
   <url>
-    <loc>http://yoursite.com/categories/hexo/</loc>
+    <loc>http://yoursite.com/categories/gclvion/</loc>
     <lastmod>2021-01-25</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
-    <loc>http://yoursite.com/categories/gclvion/</loc>
+    <loc>http://yoursite.com/categories/hexo/</loc>
     <lastmod>2021-01-25</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
